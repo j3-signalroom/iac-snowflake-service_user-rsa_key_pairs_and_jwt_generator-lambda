@@ -1,1 +1,2 @@
 # IaC Snowflake User RSA Key Generator
+This AWS Lambda function, developed in Python, is designed to generate a new [RSA key pair](.blog/what-is-a-rsa-key-pair.md) specifically for a Snowflake service account user.  The generated RSA public and private key is securely stored in AWS Secrets Manager, ensuring safe retrieval and management of the key for future use by the Snowflake service.
