@@ -24,6 +24,7 @@ def lambda_handler(event, context):
     root_secret_rsa_public_key = "rsa_public_key"
     root_secret_account_value = event.get(root_secret_account_key)
     root_secret_tf_user_value = event.get(root_secret_tf_user_key)
+    rsa_private_key_branch_secret_name = "/snowflake_resource/rsa_private_key"
 
     # Command to generate a 2048-bit RSA key and convert it to PKCS#8 format
     private_key_command = "openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -nocrypt"
@@ -41,6 +42,7 @@ def lambda_handler(event, context):
         root_secret_rsa_public_key: public_key_result.stdout[27:398]
     }
     
+    # Store root secrets in the AWS Secrets Manager
     try:
         # Check if the secret already exists
         response = secretsmanager_client.get_secret_value(SecretId=root_secret_name)
@@ -52,10 +54,23 @@ def lambda_handler(event, context):
             create_secret(root_secret_name, root_secret_value)
         else:
             raise e
+        
+    # Store RSA Private Key Branch Secrets in the AWS Secrets Manager
+    try:
+        # Check if the secret already exists
+        response = secretsmanager_client.get_secret_value(SecretId=rsa_private_key_branch_secret_name)
+        # If it exists, update the secret
+        update_secret(rsa_private_key_branch_secret_name, private_key_result.stdout)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            # If the secret does not exist, create a new one
+            create_secret(rsa_private_key_branch_secret_name, private_key_result.stdout)
+        else:
+            raise e
 
     return {
         'statusCode': 200,
-        'body': json.dumps(f'Secret {root_secret_name} written to Secrets Manager')
+        'body': json.dumps(f'Root Secrets {root_secret_name} and RSA Private Key Branch Secrets {rsa_private_key_branch_secret_name} written to Secrets Manager')
     }
 
 def create_secret(secret_name, secret_value):
