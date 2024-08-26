@@ -23,7 +23,7 @@ This AWS Lambda function, developed in Python, is designed to generate a new [RS
 
 3. From the root folder of the `iac-snowflake_user-rsa_key_generator/` repository that you cloned, run the script in your Terminal to publish the RSA Key Generator AWS Lambda Docker container to your AWS ECR:
     ```shell
-    scripts/run-terraform-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
+    scripts/run-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
     ```
     Argument placeholder|Replace with
     -|-
