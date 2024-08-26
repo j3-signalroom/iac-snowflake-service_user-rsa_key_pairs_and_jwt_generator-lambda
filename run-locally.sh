@@ -2,7 +2,7 @@
 
 #
 # *** Script Syntax ***
-# scripts/run-terraform-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
+# scripts/run-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
 #
 #
 
@@ -51,14 +51,6 @@ eval $(aws2-wrap $AWS_PROFILE --export)
 export AWS_REGION=$(aws configure get sso_region $AWS_PROFILE)
 export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
 
-# Create terraform.tfvars file
-printf "aws_account_id=\"${AWS_ACCOUNT_ID}\"\
-\naws_profile=\"${AWS_PROFILE}\"\
-\naws_region=\"${AWS_REGION}\"\
-\naws_access_key_id=\"${AWS_ACCESS_KEY_ID}\"\
-\naws_secret_access_key=\"${AWS_SECRET_ACCESS_KEY}\"\
-\naws_session_token=\"${AWS_SESSION_TOKEN}\"" > terraform.tfvars
-
 # Function to handle the repo exist error
 repo_exist_handler() {
     aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force || true
@@ -66,8 +58,6 @@ repo_exist_handler() {
 
 # Set the trap to catch repo exist error
 trap 'repo_exist_handler' ERR
-
-terraform init
 
 # Execute the create or delete action
 if [ "$create_action" = true ]
@@ -82,14 +72,7 @@ then
     docker build -t ${repo_name} .
     docker tag ${repo_name}:latest ${repo_url}:latest
     docker push ${repo_url}:latest
-
-    # Create/Update/Destroy the Terraform configuration
-    terraform plan -var-file=terraform.tfvars
-    terraform apply -var-file=terraform.tfvars
 else
-    # Destroy the Terraform configuration
-    terraform destroy -var-file=terraform.tfvars
-
     # Force the delete of the ECR Repository
     aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force || true
 
