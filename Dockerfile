@@ -22,4 +22,4 @@ RUN usermod -d /app app_runner
 # Start the Python application with the newly created user
 USER app_runner
 
-CMD ["app.lambda_handler"]
+CMD ["python", "app.lambda_handler"]
