@@ -12,7 +12,7 @@ resource "null_resource" "aws_ecr_login" {
     command = "aws ecr get-login-password --region ${var.aws_region} ${var.aws_profile} | docker login --username AWS --password-stdin ${aws_ecr_repository.lambda_ecr.repository_url}"
   }
   
-  # This ensures the ECR repository is created before the Docker build/push steps
+  # This ensures the ECR repository is created before the Docker build/tag/push steps
   depends_on = [aws_ecr_repository.lambda_ecr]
 }
 
