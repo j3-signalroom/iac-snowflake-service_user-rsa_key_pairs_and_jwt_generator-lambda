@@ -5,7 +5,7 @@ terraform {
 
         workspaces {
             #name = "<TERRAFORM CLOUD ORGANIZATION's WORKSPACE NAME>"
-            name = "aws-lambda-ecr-workspace"
+            name = "aws-lambda-ecr-workspace-001"
         }
   }
 
@@ -18,6 +18,5 @@ terraform {
 }
 
 locals {
-  cloud     = "AWS"
-  repo_name = "iac-snowflake_user-rsa_key_generator"
+  cloud = "AWS"  
 }
