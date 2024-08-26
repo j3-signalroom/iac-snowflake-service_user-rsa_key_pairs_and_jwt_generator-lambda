@@ -6,19 +6,41 @@ resource "aws_ecr_repository" "lambda_ecr" {
 # Get the login command from ECR to authenticate Docker to your registry
 data "aws_ecr_authorization_token" "auth" {}
 
-# Build Docker Image and Push to ECR
-resource "null_resource" "docker_build_and_push" {
+# Authenticate Docker to your AWS ECR
+resource "null_resource" "aws_ecr_login" {
   provisioner "local-exec" {
-    command = <<EOT
-      aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repository.lambda_ecr.repository_url}
-      docker build -t local.repo_name .
-      docker tag local.repo_name:latest ${aws_ecr_repository.lambda_ecr.repository_url}:latest
-      docker push ${aws_ecr_repository.lambda_ecr.repository_url}:latest
-    EOT
+    command = "aws ecr get-login-password --region ${var.aws_region} ${var.aws_profile} | docker login --username AWS --password-stdin ${aws_ecr_repository.lambda_ecr.repository_url}"
   }
   
   # This ensures the ECR repository is created before the Docker build/push steps
   depends_on = [aws_ecr_repository.lambda_ecr]
+}
+
+resource "null_resource" "docker_build" {
+  triggers = {
+    order = null_resource.aws_ecr_login.id
+  }
+  provisioner "local-exec" {
+    command = "docker build -t local.repo_name ."
+  }
+}
+
+resource "null_resource" "docker_tag" {
+  triggers = {
+    order = null_resource.docker_build.id
+  }
+  provisioner "local-exec" {
+    command = "docker tag local.repo_name:latest ${aws_ecr_repository.lambda_ecr.repository_url}:latest"
+  }
+}
+
+resource "null_resource" "docker_push" {
+  triggers = {
+    order = null_resource.docker_tag.id
+  }
+  provisioner "local-exec" {
+    command = "docker push ${aws_ecr_repository.lambda_ecr.repository_url}:latest"
+  }
 }
 
 # IAM role for Lambda execution

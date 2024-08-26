@@ -37,7 +37,7 @@ done
 if [ -z $AWS_PROFILE ]
 then
     echo
-    echo "(Error Message 002)  You did not include the proper use of the --profile=<AWS_SSO_SSO_PROFILE_NAME> argument in the call."
+    echo "(Error Message 002)  You did not include the proper use of the --profile=<SSO_PROFILE_NAME> argument in the call."
     echo
     echo "Usage:  Require all four arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME>"
     echo
@@ -52,7 +52,7 @@ export AWS_REGION=$(aws configure get sso_region $AWS_PROFILE)
 
 # Create terraform.tfvars file
 printf "aws_account_id=\"${AWS_ACCOUNT_ID}\"\
-\naws_profile=\"${environment_name}\"\
+\naws_profile=\"${AWS_PROFILE}\"\
 \naws_region=\"${AWS_REGION}\"\
 \naws_access_key_id=\"${AWS_ACCESS_KEY_ID}\"\
 \naws_secret_access_key=\"${AWS_SECRET_ACCESS_KEY}\"\
