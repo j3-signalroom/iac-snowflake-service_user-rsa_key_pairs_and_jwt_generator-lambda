@@ -1,11 +1,9 @@
 terraform {
     cloud {
-      #organization = "<TERRAFORM CLOUD ORGANIZATION NAME>"
-      organization = "signalroom"
+      organization = "<TERRAFORM CLOUD ORGANIZATION NAME>"
 
         workspaces {
-            #name = "<TERRAFORM CLOUD ORGANIZATION's WORKSPACE NAME>"
-            name = "aws-lambda-ecr-workspace-001"
+            name = "<TERRAFORM CLOUD ORGANIZATION's WORKSPACE NAME>"
         }
   }
 
