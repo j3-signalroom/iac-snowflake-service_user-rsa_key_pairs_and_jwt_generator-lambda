@@ -5,9 +5,6 @@ This AWS Lambda function, developed in Python, is designed to generate a new [RS
 
 <!-- toc -->
 + [1.0 Let's get started!](#10-lets-get-started)
-    - [1.1 AWS Secrets Manager Secrets](#11-aws-secrets-manager-secrets)
-        + [1.1.1 `/snowflake_resource`](#111-snowflake_resource)
-        + [1.1.2 `/snowflake_resource/rsa_private_key`](#112-snowflake_resourcersa_private_key)
 <!-- tocstop -->
 
 ## 1.0 Let's get started!
