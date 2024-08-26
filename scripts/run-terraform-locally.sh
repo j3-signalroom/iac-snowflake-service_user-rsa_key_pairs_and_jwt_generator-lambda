@@ -72,15 +72,15 @@ terraform init
 # Execute the create or delete action
 if [ "$create_action" = true ]
 then
-    #
+    # Define the ECR Repository name and URL variables
     repo_name="iac-snowflake_user-rsa_key_generator"
     repo_url="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${repo_name}"
 
-    #
+    # Create the ECR Repository and build/push the Docker image to the ECR Repository
     aws ecr create-repository --repository-name ${repo_name} ${AWS_PROFILE} || true
     aws ecr get-login-password --region ${AWS_REGION} ${AWS_PROFILE} | docker login --username AWS --password-stdin ${repo_url}
-    docker build -t local.repo_name .
-    docker tag local.repo_name:latest ${repo_url}:latest
+    docker build -t ${repo_name} .
+    docker tag ${repo_name}:latest ${repo_url}:latest
     docker push ${repo_url}:latest
 
     # Create/Update/Destroy the Terraform configuration
