@@ -63,7 +63,7 @@ trap 'repo_exist_handler' ERR
 if [ "$create_action" = true ]
 then
     # Define the ECR Repository name and URL variables
-    repo_name="iac-snowflake_user-rsa_key_generator"
+    repo_name="iac-snowflake-user-rsa_key_pair_generator-lambda"
     repo_url="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${repo_name}"
 
     # Create the ECR Repository
