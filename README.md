@@ -18,10 +18,10 @@ Use this AWS Lambda function, written in Python, to generate two new [RSA key pa
 
 2. Clone the repo:
     ```shell
-    git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pair_generator-lambda.git
+    git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda.git
     ```
 
-3. From the root folder of the `iac-snowflake-user-rsa_key_pair_generator-lambda/` repository that you cloned, run the script in your Terminal to publish the RSA key pair generator AWS Lambda Docker container to your AWS ECR:
+3. From the root folder of the `iac-snowflake-user-rsa_key_pairs_generator-lambda/` repository that you cloned, run the script in your Terminal to publish the RSA key pair generator AWS Lambda Docker container to your AWS ECR:
     ```shell
     scripts/run-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
     ```
