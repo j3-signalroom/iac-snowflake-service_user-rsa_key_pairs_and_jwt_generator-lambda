@@ -66,9 +66,13 @@ then
     repo_name="iac-snowflake_user-rsa_key_generator"
     repo_url="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${repo_name}"
 
-    # Create the ECR Repository and build/push the Docker image to the ECR Repository
+    # Create the ECR Repository
     aws ecr create-repository --repository-name ${repo_name} ${AWS_PROFILE} || true
+
+    # Get the Docker login password and login to the ECR Repository
     aws ecr get-login-password --region ${AWS_REGION} ${AWS_PROFILE} | docker login --username AWS --password-stdin ${repo_url}
+
+    # Build the Docker image and push the Docker image to the ECR Repository
     docker build -t ${repo_name} .
     docker tag ${repo_name}:latest ${repo_url}:latest
     docker push ${repo_url}:latest
@@ -76,7 +80,7 @@ else
     # Force the delete of the ECR Repository
     aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force || true
 
-    # Force the delete of the AWS Secret
+    # Force the delete of the AWS Secrets Manager secrets
     aws secretsmanager delete-secret --secret-id '/snowflake_resource' --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id '/snowflake_resource/rsa_private_key' --force-delete-without-recovery || true
 fi
