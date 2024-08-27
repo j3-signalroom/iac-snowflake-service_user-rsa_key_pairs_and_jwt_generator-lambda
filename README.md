@@ -1,5 +1,5 @@
 # IaC Snowflake User RSA Key Generator
-This AWS Lambda function, developed in Python, is designed to generate a new [RSA key pair](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) specifically for a Snowflake service account user.  The generated RSA public and private key is securely stored in AWS Secrets Manager, ensuring safe retrieval and management of the key for future use by the Snowflake service.
+Use this AWS Lambda function, written in Python, to generate two new [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) for a specific Snowflake user. After generation, the function automatically stores the RSA key pairs securely in your AWS Secrets Manager. This ensures the keys can be safely retrieved and managed for future use by the Snowflake user.
 
 **Table of Contents**
 
@@ -18,10 +18,10 @@ This AWS Lambda function, developed in Python, is designed to generate a new [RS
 
 2. Clone the repo:
     ```shell
-    git clone https://github.com/j3-signalroom/iac-snowflake_user-rsa_key_generator.git
+    git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pair_generator-lambda.git
     ```
 
-3. From the root folder of the `iac-snowflake_user-rsa_key_generator/` repository that you cloned, run the script in your Terminal to publish the RSA Key Generator AWS Lambda Docker container to your AWS ECR:
+3. From the root folder of the `iac-snowflake-user-rsa_key_pair_generator-lambda/` repository that you cloned, run the script in your Terminal to publish the RSA key pair generator AWS Lambda Docker container to your AWS ECR:
     ```shell
     scripts/run-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
     ```
