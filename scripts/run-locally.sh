@@ -53,7 +53,7 @@ export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output t
 
 # Function to handle the repo exist error
 repo_exist_handler() {
-    aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force || true
+    aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force
 }
 
 # Set the trap to catch repo exist error
@@ -79,8 +79,4 @@ then
 else
     # Force the delete of the ECR Repository
     aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force || true
-
-    # Force the delete of the AWS Secrets Manager secrets
-    aws secretsmanager delete-secret --secret-id '/snowflake_resource' --force-delete-without-recovery || true
-    aws secretsmanager delete-secret --secret-id '/snowflake_resource/rsa_private_key' --force-delete-without-recovery || true
 fi
