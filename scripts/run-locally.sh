@@ -59,13 +59,13 @@ repo_exist_handler() {
 # Set the trap to catch repo exist error
 trap 'repo_exist_handler' ERR
 
+# Define the ECR Repository name and URL variables
+repo_name="iac-snowflake-user-rsa_key_pairs_generator"
+repo_url="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${repo_name}"
+
 # Execute the create or delete action
 if [ "$create_action" = true ]
 then
-    # Define the ECR Repository name and URL variables
-    repo_name="iac-snowflake-user-rsa_key_pairs_generator-lambda"
-    repo_url="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${repo_name}"
-
     # Create the ECR Repository
     aws ecr create-repository --repository-name ${repo_name} ${AWS_PROFILE} || true
 
