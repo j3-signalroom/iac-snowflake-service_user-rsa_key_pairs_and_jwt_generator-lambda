@@ -73,7 +73,7 @@ then
     aws ecr get-login-password --region ${AWS_REGION} ${AWS_PROFILE} | docker login --username AWS --password-stdin ${repo_url}
 
     # Build the Docker image and push the Docker image to the ECR Repository
-    docker build -t ${repo_name} .
+    docker build --platform linux/amd64 -t ${repo_name} .
     docker tag ${repo_name}:latest ${repo_url}:latest
     docker push ${repo_url}:latest
 else
