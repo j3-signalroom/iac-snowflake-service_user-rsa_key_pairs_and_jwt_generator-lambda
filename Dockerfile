@@ -5,4 +5,4 @@ RUN yum -y install openssl
 # Copy code from host into the container
 COPY app.py .
 
-CMD ["python", "lambda_handler"]
+CMD ["lambda_handler"]
