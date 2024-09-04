@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.00.000] - 2024-09-04
+### Changed
+- The lambda function should only update the secrets, never create them, because the Terraform module needs to handle that task in order for Terraform to manage the creation and destruction of the secrets.
+
 ## [0.22.00.000] - 2024-09-04
 ### Changed
 - Ensure newlines, carriage returns, and spaces are not in the `rsa_public_key_1` and `rsa_public_key_2` fields.

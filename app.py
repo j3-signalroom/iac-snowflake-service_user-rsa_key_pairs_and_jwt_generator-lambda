@@ -58,11 +58,7 @@ def lambda_handler(event, context):
         # If it exists, update the secret
         update_secret(root_secret_name, root_secret_value)
     except ClientError as e:
-        if e.response['Error']['Code'] == 'ResourceNotFoundException':
-            # If the secret does not exist, create a new one
-            create_secret(root_secret_name, root_secret_value)
-        else:
-            raise e
+        raise e
         
     # Store RSA Private Key PEM 1 Branch Secrets in the AWS Secrets Manager
     try:
@@ -71,11 +67,7 @@ def lambda_handler(event, context):
         # If it exists, update the secret
         update_secret(rsa_private_key_pem_1_branch_secret_name, private_key_pem_1_result.stdout)
     except ClientError as e:
-        if e.response['Error']['Code'] == 'ResourceNotFoundException':
-            # If the secret does not exist, create a new one
-            create_secret(rsa_private_key_pem_1_branch_secret_name, private_key_pem_1_result.stdout)
-        else:
-            raise e
+        raise e
         
     # Store RSA Private Key PEM 2 Branch Secrets in the AWS Secrets Manager
     try:
@@ -84,39 +76,12 @@ def lambda_handler(event, context):
         # If it exists, update the secret
         update_secret(rsa_private_key_pem_2_branch_secret_name, private_key_pem_2_result.stdout)
     except ClientError as e:
-        if e.response['Error']['Code'] == 'ResourceNotFoundException':
-            # If the secret does not exist, create a new one
-            create_secret(rsa_private_key_pem_2_branch_secret_name, private_key_pem_2_result.stdout)
-        else:
-            raise e
+        raise e
 
     return {
         'statusCode': 200,
         'body': json.dumps(f'Root Secrets {root_secret_name}, RSA Private Key PEM 1 Branch Secrets {rsa_private_key_pem_1_branch_secret_name}, and RSA Private Key PEM 2 Branch Secrets {rsa_private_key_pem_2_branch_secret_name} written to Secrets Manager')
     }
-
-def create_secret(secret_name, secret_value):
-    """
-    Create a new secret in AWS Secrets Manager.
-
-    Args:
-        secret_name (string): AWS Secrets Manager secret name.
-        secret_value (dict): AWS Secrets Manager secret value.
-
-    Raises:
-        e: when an error occurs while making a request to the 
-        AWS Secrets Manager library.
-    """
-
-    try:
-        response = secretsmanager_client.create_secret(
-            Name=secret_name,
-            SecretString=json.dumps(secret_value)
-        )
-        print(f"Created secret: {response}")
-    except ClientError as e:
-        print(f"Failed to create secret: {e}")
-        raise e
 
 def update_secret(secret_name, secret_value):
     """
