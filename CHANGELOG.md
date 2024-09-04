@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.22.00.000] - 2024-09-03
+## [0.22.00.000] - 2024-09-04
 ### Changed
 - Ensure newlines, carriage returns, and spaces are not in the `rsa_public_key_1` and `rsa_public_key_2` fields.
 - Force rebuild of docker container on every run.
