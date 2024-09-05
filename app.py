@@ -47,8 +47,8 @@ def lambda_handler(event, context):
     root_secret_value = {
         root_secret_account_key: root_secret_account_value,
         root_secret_user_key: root_secret_user_value,
-        root_secret_rsa_public_key_1: public_key_1_result.stdout[27:398].replace("\n", "").replace("\r", ""),
-        root_secret_rsa_public_key_2: public_key_2_result.stdout[27:398].replace("\n", "").replace("\r", "")
+        root_secret_rsa_public_key_1: public_key_1_result.stdout[27:(len(public_key_1_result.stdout)-25)].replace("\n", "").replace("\r", ""),
+        root_secret_rsa_public_key_2: public_key_2_result.stdout[27:(len(public_key_2_result.stdout)-25)].replace("\n", "").replace("\r", "")
     }
     
     # Store root secrets in the AWS Secrets Manager
