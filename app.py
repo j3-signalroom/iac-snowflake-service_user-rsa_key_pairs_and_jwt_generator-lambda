@@ -47,7 +47,13 @@ def lambda_handler(event, context):
     root_secret_value = {
         root_secret_account_key: root_secret_account_value,
         root_secret_user_key: root_secret_user_value,
+
+        # RSA public key 1; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
+        # so only one continuous string remains, which meet Snowflake's requirements
         root_secret_rsa_public_key_1: public_key_1_result.stdout[27:(len(public_key_1_result.stdout)-25)].replace("\n", "").replace("\r", ""),
+
+        # RSA public key 2; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
+        # so only one continuous string remains, which meet Snowflake's requirements.
         root_secret_rsa_public_key_2: public_key_2_result.stdout[27:(len(public_key_2_result.stdout)-25)].replace("\n", "").replace("\r", "")
     }
     
