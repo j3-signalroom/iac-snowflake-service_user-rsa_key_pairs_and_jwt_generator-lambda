@@ -6,18 +6,21 @@ from botocore.exceptions import ClientError
 secretsmanager_client = boto3.client('secretsmanager')
 
 def lambda_handler(event, context):
-    """_summary_
+    """
+    This AWS Lambda function creates two RSA key pairs (public and private), and then securely
+    store them in AWS Secrets Manager.
+
 
     Args:
         event (dict): The event data passed to the Lambda function.
         context (object): The metadata about the invocation, function, and execution environment.
 
     Returns:
-        statusCode: _description_
-        body: _description_
+        statusCode: 200 for a successfully run of the function.
+        body: List of the secret names updated by the function.
     """
 
-    #
+    # Define the labels for the secrets
     root_secret_name = "/snowflake_resource"
     root_secret_account_key = "account"
     root_secret_user_key = "user"
