@@ -47,4 +47,32 @@ This AWS Lambda function, developed in Python, automates the generation of two n
     ```
     Replace `my-aws-sso-profile` with your actual AWS SSO profile name.
 
+6. Or, to run the similiar script from GitHub, follow these steps:
+
+    a. Deploy the Repository: Ensure that you have cloned or forked the repository to your GitHub account.
+
+    b. Set Required Secrets and Variables: Before running any of the GitHub workflows provided in the repository, you must define at least the `AWS_DEV_ACCOUNT_ID` variable (which should contain your AWS Account ID for your development environment). To do this:
+
+    - Go to the Settings of your cloned or forked repository in GitHub.
+
+    - Navigate to **Secrets and Variables > Actions**.
+
+    - Add the `AWS_DEV_ACCOUNT_ID` and any other required variables or secrets.
+
+    c. Navigate to the **Actions Page**:
+
+    - From the cloned or forked repository on GitHub, click on the **Actions tab**.
+
+    d. **Select and Run the Deploy Workflow**:
+
+    - Find the **Deploy** workflow link on the left side of the **Actions** page and click on it.
+
+        ![github-actions-workflows-screenshot](.blog/images/github-actions-workflows-screenshot.png)
+
+    - On the **Deploy** workflow page, click the **Run workflow** button.
+
+    - A workflow dialog box will appear. Fill in the necessary details and click **Run workflow** to initiate the building and publishing the Lambda docker container to ECR.
+
+        ![github-deploy-workflow-screenshot](.blog/images/github-deploy-workflow-screenshot.png)
+
 By following these steps, you will set up the necessary infrastructure to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake.
