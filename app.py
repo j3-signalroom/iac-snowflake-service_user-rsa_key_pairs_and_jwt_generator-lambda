@@ -22,15 +22,22 @@ def lambda_handler(event, context):
 
     # Define the labels for the secrets
     secret_insert_key = "secret_insert"
-    root_secret_name = "/snowflake_resource" + event.get(secret_insert_key, "")
+    if event.get(secret_insert_key, "") == "":
+        root_secret_name = "/snowflake_resource"
+        rsa_private_key_pem_1_branch_secret_name = "/snowflake_resource/rsa_private_key_pem_1"
+        rsa_private_key_pem_2_branch_secret_name = "/snowflake_resource/rsa_private_key_pem_2"
+    else:
+        root_secret_name = "/snowflake_resource/" + event.get(secret_insert_key, "")
+        rsa_private_key_pem_1_branch_secret_name = "/snowflake_resource/" + event.get(secret_insert_key, "") + "/rsa_private_key_pem_1"
+        rsa_private_key_pem_2_branch_secret_name = "/snowflake_resource/" + event.get(secret_insert_key, "") + "/rsa_private_key_pem_2"
+                                              
     root_secret_account_key = "account"
     root_secret_user_key = "user"
     root_secret_rsa_public_key_1 = "rsa_public_key_1"
     root_secret_rsa_public_key_2 = "rsa_public_key_2"
     root_secret_account_value = event.get(root_secret_account_key)
     root_secret_user_value = event.get(root_secret_user_key)
-    rsa_private_key_pem_1_branch_secret_name = "/snowflake_resource" + event.get(secret_insert_key, "") + "/rsa_private_key_pem_1"
-    rsa_private_key_pem_2_branch_secret_name = "/snowflake_resource" + event.get(secret_insert_key, "") + "/rsa_private_key_pem_2"
+    
 
     # Command to generate a 2048-bit RSA key and convert it to PKCS#8 format
     private_key_command = "openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -nocrypt"
