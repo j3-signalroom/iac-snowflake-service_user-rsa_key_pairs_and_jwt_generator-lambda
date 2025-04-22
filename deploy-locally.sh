@@ -2,7 +2,7 @@
 
 #
 # *** Script Syntax ***
-# scripts/run-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
+# deploy-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
 #
 #
 
