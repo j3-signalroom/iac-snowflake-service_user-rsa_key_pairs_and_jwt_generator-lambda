@@ -1,7 +1,9 @@
-import subprocess
 import json
 import boto3
 from botocore.exceptions import ClientError
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+
 
 secretsmanager_client = boto3.client('secretsmanager')
 
@@ -38,21 +40,19 @@ def lambda_handler(event, context):
     root_secret_account_value = event.get(root_secret_account_key)
     root_secret_user_value = event.get(root_secret_user_key)
     
+    # Generate the private key pem 1 and public key 1
+    private_key_1 = rsa.generate_private_key(public_exponent=65537, key_size=2048,)
+    private_key_pem_1 = private_key_1.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption(),)
+    private_key_pem_1_result = private_key_pem_1.decode()
+    public_key_pem_1 = private_key_pem_1.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo,)
+    public_key_1_pem_result = public_key_pem_1.decode()
 
-    # Command to generate a 2048-bit RSA key and convert it to PKCS#8 format
-    private_key_command = "openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -nocrypt"
-
-    # Run the command to generate the private key pem 1
-    private_key_pem_1_result = subprocess.run(private_key_command, shell=True, check=True, capture_output=True, text=True)
-
-    # Run the command to generate the public key 1 from the private key pem 1
-    public_key_1_result = subprocess.run(['openssl', 'rsa', '-pubout'], input=private_key_pem_1_result.stdout, capture_output=True, text=True, check=True)
-
-    # Run the command to generate the private key pem 2
-    private_key_pem_2_result = subprocess.run(private_key_command, shell=True, check=True, capture_output=True, text=True)
-
-    # Run the command to generate the public key 2 from the private key pem 2
-    public_key_2_result = subprocess.run(['openssl', 'rsa', '-pubout'], input=private_key_pem_2_result.stdout, capture_output=True, text=True, check=True)
+    # Generate the private key pem 2 and public key 2
+    private_key_2 = rsa.generate_private_key(public_exponent=65537, key_size=2048,)
+    private_key_pem_2 = private_key_2.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption(),)
+    private_key_pem_2_result = private_key_pem_2.decode()
+    public_key_pem_2 = private_key_pem_2.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo,)
+    public_key_2_pem_result = public_key_pem_2.decode()
 
     # Create a dictionary with the root secrets
     root_secret_value = {
@@ -61,17 +61,18 @@ def lambda_handler(event, context):
 
         # RSA public key 1; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
         # so only one continuous string remains, which meet Snowflake's requirements
-        root_secret_rsa_public_key_1: public_key_1_result.stdout[27:(len(public_key_1_result.stdout)-25)].replace("\n", "").replace("\r", ""),
+        root_secret_rsa_public_key_1: public_key_1_pem_result.stdout[27:(len(public_key_1_pem_result.stdout)-25)].replace("\n", "").replace("\r", ""),
 
         # RSA public key 2; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
         # so only one continuous string remains, which meet Snowflake's requirements.
-        root_secret_rsa_public_key_2: public_key_2_result.stdout[27:(len(public_key_2_result.stdout)-25)].replace("\n", "").replace("\r", "")
+        root_secret_rsa_public_key_2: public_key_2_pem_result.stdout[27:(len(public_key_2_pem_result.stdout)-25)].replace("\n", "").replace("\r", "")
     }
     
     # Store root secrets in the AWS Secrets Manager
     try:
         # Check if the secret already exists
-        response = secretsmanager_client.get_secret_value(SecretId=root_secret_name)
+        secretsmanager_client.get_secret_value(SecretId=root_secret_name)
+
         # If it exists, update the secret
         update_secret(root_secret_name, root_secret_value)
     except ClientError as e:
@@ -80,7 +81,8 @@ def lambda_handler(event, context):
     # Store RSA Private Key PEM 1 Branch Secrets in the AWS Secrets Manager
     try:
         # Check if the secret already exists
-        response = secretsmanager_client.get_secret_value(SecretId=rsa_private_key_pem_1_branch_secret_name)
+        secretsmanager_client.get_secret_value(SecretId=rsa_private_key_pem_1_branch_secret_name)
+
         # If it exists, update the secret
         update_secret(rsa_private_key_pem_1_branch_secret_name, private_key_pem_1_result.stdout)
     except ClientError as e:
@@ -89,7 +91,8 @@ def lambda_handler(event, context):
     # Store RSA Private Key PEM 2 Branch Secrets in the AWS Secrets Manager
     try:
         # Check if the secret already exists
-        response = secretsmanager_client.get_secret_value(SecretId=rsa_private_key_pem_2_branch_secret_name)
+        secretsmanager_client.get_secret_value(SecretId=rsa_private_key_pem_2_branch_secret_name)
+
         # If it exists, update the secret
         update_secret(rsa_private_key_pem_2_branch_secret_name, private_key_pem_2_result.stdout)
     except ClientError as e:
