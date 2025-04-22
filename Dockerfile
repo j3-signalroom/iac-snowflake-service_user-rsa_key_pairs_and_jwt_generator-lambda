@@ -1,7 +1,10 @@
 FROM public.ecr.aws/lambda/python:3.11.2024.11.22.15
 
-RUN yum -y update
-RUN yum -y install openssl
+RUN yum -y update && yum -y install openssl --skip-broken
+
+# Container metadata
+LABEL maintainer=j3@thej3.com \
+      description="IaC Snowflake User RSA Key Pairs Generator Lambda"
 
 # Copy code from host into the container
 COPY app.py ${LAMBDA_TASK_ROOT}
