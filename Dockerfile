@@ -1,7 +1,5 @@
 FROM public.ecr.aws/lambda/python:3.11.2024.11.22.15
 
-RUN yum -y update && yum -y install openssl --skip-broken
-
 # Container metadata
 LABEL maintainer=j3@thej3.com \
       description="IaC Snowflake User RSA Key Pairs Generator Lambda"
@@ -10,6 +8,7 @@ LABEL maintainer=j3@thej3.com \
 COPY app.py ${LAMBDA_TASK_ROOT}
 
 # install packages
+RUN python3 -m pip install "cryptography>=44.0.2"
 RUN python3 -m pip install "boto3>=1.35.36"
 RUN python3 -m pip install "setuptools>=65.5.1"
 
