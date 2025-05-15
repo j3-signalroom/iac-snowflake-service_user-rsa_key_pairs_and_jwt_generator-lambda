@@ -3,9 +3,17 @@ import boto3
 from botocore.exceptions import ClientError
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+import logging
 
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Initialize the AWS Secrets Manager client
 secretsmanager_client = boto3.client('secretsmanager')
+
 
 def lambda_handler(event, context):
     """
@@ -40,18 +48,42 @@ def lambda_handler(event, context):
     root_secret_account_value = event.get(root_secret_account_key)
     root_secret_user_value = event.get(root_secret_user_key)
     
-    # Generate the private key pem 1 and public key 1
-    private_key_1 = rsa.generate_private_key(public_exponent=65537, key_size=2048,)
-    private_key_pem_1 = private_key_1.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption(),)
+    # Generate the private key PEM 1.
+    private_key_1 = rsa.generate_private_key(
+        public_exponent=65537, 
+        key_size=2048
+    )
+    private_key_pem_1 = private_key_1.private_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PrivateFormat.PKCS8, 
+        encryption_algorithm=serialization.NoEncryption()
+    )
     private_key_pem_1_result = private_key_pem_1.decode()
-    public_key_pem_1 = private_key_pem_1.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo,)
+
+    # Generate the public key PEM 1.
+    public_key_pem_1 = private_key_1.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
     public_key_1_pem_result = public_key_pem_1.decode()
 
-    # Generate the private key pem 2 and public key 2
-    private_key_2 = rsa.generate_private_key(public_exponent=65537, key_size=2048,)
-    private_key_pem_2 = private_key_2.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption(),)
+    # Generate the private key PEM 2.
+    private_key_2 = rsa.generate_private_key(
+        public_exponent=65537, 
+        key_size=2048
+    )
+    private_key_pem_2 = private_key_2.private_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PrivateFormat.PKCS8, 
+        encryption_algorithm=serialization.NoEncryption()
+    )
     private_key_pem_2_result = private_key_pem_2.decode()
-    public_key_pem_2 = private_key_pem_2.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo,)
+
+    # Generate the public key PEM 2.
+    public_key_pem_2 = private_key_2.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
     public_key_2_pem_result = public_key_pem_2.decode()
 
     # Create a dictionary with the root secrets
@@ -103,6 +135,7 @@ def lambda_handler(event, context):
         'body': json.dumps(f'Root Secrets {root_secret_name}, RSA Private Key PEM 1 Branch Secrets {rsa_private_key_pem_1_branch_secret_name}, and RSA Private Key PEM 2 Branch Secrets {rsa_private_key_pem_2_branch_secret_name} written to Secrets Manager')
     }
 
+
 def update_secret(secret_name, secret_value):
     """
     Update a secret in AWS Secrets Manager.
@@ -121,7 +154,7 @@ def update_secret(secret_name, secret_value):
             SecretId=secret_name,
             SecretString=json.dumps(secret_value)
         )
-        print(f"Updated secret: {response}")
+        logging.error("Updated secret: %s", response)
     except ClientError as e:
-        print(f"Failed to update secret: {e}")
+        logging.error("Failed to update secret: %s", e)
         raise e
