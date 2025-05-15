@@ -3,9 +3,9 @@ name = "iac-snowflake-user-rsa-key-pairs-generator-lambda"
 version = "0.43.01.000"
 description = "Use this AWS Lambda function, written in Python, to generate two new RSA key pairs for a specific Snowflake user. After generation, the function automatically stores the RSA key pairs securely in your AWS Secrets Manager. This ensures the keys can be safely retrieved and managed for future use by the Snowflake user."
 readme = "README.md"
-requires-python = "~=3.11.9"
+requires-python = ">=3.13"
 dependencies = [
-    "boto3>=1.35.36",
-    "cryptography>=44.0.2",
-    "setuptools>=65.5.1",
+    "boto3>=1.38.16",
+    "cryptography>=44.0.3",
+    "pytest>=8.3.5",
 ]

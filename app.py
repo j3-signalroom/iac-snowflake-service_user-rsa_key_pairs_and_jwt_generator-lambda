@@ -3,9 +3,17 @@ import boto3
 from botocore.exceptions import ClientError
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+import logging
 
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Initialize the AWS Secrets Manager client
 secretsmanager_client = boto3.client('secretsmanager')
+
 
 def lambda_handler(event, context):
     """
@@ -127,6 +135,7 @@ def lambda_handler(event, context):
         'body': json.dumps(f'Root Secrets {root_secret_name}, RSA Private Key PEM 1 Branch Secrets {rsa_private_key_pem_1_branch_secret_name}, and RSA Private Key PEM 2 Branch Secrets {rsa_private_key_pem_2_branch_secret_name} written to Secrets Manager')
     }
 
+
 def update_secret(secret_name, secret_value):
     """
     Update a secret in AWS Secrets Manager.
@@ -145,7 +154,7 @@ def update_secret(secret_name, secret_value):
             SecretId=secret_name,
             SecretString=json.dumps(secret_value)
         )
-        print(f"Updated secret: {response}")
+        logging.error("Updated secret: %s", response)
     except ClientError as e:
-        print(f"Failed to update secret: {e}")
+        logging.error("Failed to update secret: %s", e)
         raise e
