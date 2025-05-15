@@ -6,6 +6,7 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 <!-- toc -->
 + [1.0 Let's get started!](#10-lets-get-started)
 + [2.0 Resources](#20-resources)
++ [3.0 Conclusion](#30-conclusion)
 <!-- tocstop -->
 
 ## 1.0 Let's get started!
@@ -79,4 +80,5 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 ## 2.0 Resources
 - [RSA API](https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/)
 
-By following these steps, you will set up the necessary infrastructure to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake.
+## 3.0 Conclusion
+By following the steps outlined in this guide, you will successfully set up the necessary infrastructure to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake. The process involves creating an AWS Elastic Container Registry (ECR) repository, building the Lambda Docker container, and publishing it to the ECR repository. This setup ensures that the RSA key pairs are securely generated and stored, enabling public-key authentication for your Snowflake service account user.
