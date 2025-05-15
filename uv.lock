@@ -93,7 +93,7 @@ wheels = [
 
 [[package]]
 name = "iac-snowflake-user-rsa-key-pairs-generator-lambda"
-version = "0.43.0.0"
+version = "0.43.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "boto3" },
