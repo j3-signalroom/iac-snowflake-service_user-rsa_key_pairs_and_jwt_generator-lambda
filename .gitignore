@@ -4,3 +4,5 @@ scratch-pad.md
 **/__pycache__
 *.log
 .env
+test.log
+
