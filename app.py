@@ -40,18 +40,42 @@ def lambda_handler(event, context):
     root_secret_account_value = event.get(root_secret_account_key)
     root_secret_user_value = event.get(root_secret_user_key)
     
-    # Generate the private key pem 1 and public key 1
-    private_key_1 = rsa.generate_private_key(public_exponent=65537, key_size=2048,)
-    private_key_pem_1 = private_key_1.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption(),)
+    # Generate the private key PEM 1.
+    private_key_1 = rsa.generate_private_key(
+        public_exponent=65537, 
+        key_size=2048
+    )
+    private_key_pem_1 = private_key_1.private_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PrivateFormat.PKCS8, 
+        encryption_algorithm=serialization.NoEncryption()
+    )
     private_key_pem_1_result = private_key_pem_1.decode()
-    public_key_pem_1 = private_key_pem_1.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo,)
+
+    # Generate the public key PEM 1.
+    public_key_pem_1 = private_key_1.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
     public_key_1_pem_result = public_key_pem_1.decode()
 
-    # Generate the private key pem 2 and public key 2
-    private_key_2 = rsa.generate_private_key(public_exponent=65537, key_size=2048,)
-    private_key_pem_2 = private_key_2.private_bytes(encoding=serialization.Encoding.PEM, format=serialization.PrivateFormat.PKCS8, encryption_algorithm=serialization.NoEncryption(),)
+    # Generate the private key PEM 2.
+    private_key_2 = rsa.generate_private_key(
+        public_exponent=65537, 
+        key_size=2048
+    )
+    private_key_pem_2 = private_key_2.private_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PrivateFormat.PKCS8, 
+        encryption_algorithm=serialization.NoEncryption()
+    )
     private_key_pem_2_result = private_key_pem_2.decode()
-    public_key_pem_2 = private_key_pem_2.public_key().public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo,)
+
+    # Generate the public key PEM 2.
+    public_key_pem_2 = private_key_2.public_key().public_bytes(
+        encoding=serialization.Encoding.PEM, 
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
     public_key_2_pem_result = public_key_pem_2.decode()
 
     # Create a dictionary with the root secrets
