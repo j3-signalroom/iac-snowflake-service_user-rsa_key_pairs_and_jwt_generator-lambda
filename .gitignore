@@ -1,4 +1,8 @@
-.DS_Store
-.venv/
-.vscode/
 scratch-pad.md
+.venv/
+.DS_Store
+**/__pycache__
+*.log
+.env
+test.log
+
