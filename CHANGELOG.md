@@ -6,36 +6,36 @@ The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 
 ## [0.44.00.000] - 2025-05-16
 ### Added
-- Issue[#78](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/78)
+- Issue [#78](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/78)
 
 ### Fixed
-- Issue[#76](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/76)
+- Issue [#76](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/76)
 
 ## [0.43.02.000] - 2025-05-16
 ### Changed
-- Issue[#73](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/73)
+- Issue [#73](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/73)
 
 ## [0.43.01.000] - 2025-05-15
 ### Added
-- Issue[#71](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/71)
+- Issue [#71](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/71)
 
 ### Fixed
-- Issue[#69](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/69)
+- Issue [#69](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/69)
 
 ## [0.43.00.000] - 2025-04-22
 ### Changed
-- Issue[#67](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/67)
+- Issue [#67](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/67)
 
 ### Fixed
-- Issue[#65](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/65)
+- Issue [#65](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/65)
 
 ## [0.42.00.000] - 2025-04-21
 ### Fixed
-- Issue[#63](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/63)
+- Issue [#63](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/63)
 
 ## [0.41.00.000] - 2024-12-10
 ### Added
-- [Issue #61](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/61)
+- Issue [#61](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/61)
 
 ## [0.40.00.000] - 2024-09-06
 ### Added
