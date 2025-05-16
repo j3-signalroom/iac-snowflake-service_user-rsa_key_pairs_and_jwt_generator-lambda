@@ -10,7 +10,7 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 <!-- tocstop -->
 
 ## 1.0 Let's get started!
-1. Take care of the cloud and local environment prequisities listed below:
+1. **Prequisities**:  Take care of the cloud and local environment prequisities listed below:
     > You need to have the following cloud accounts:
     > - [AWS Account](https://signin.aws.amazon.com/) *with SSO configured*
     > - [`aws2-wrap` utility](https://pypi.org/project/aws2-wrap/#description)
@@ -18,12 +18,12 @@ This AWS Lambda function, developed in Python, automates the generation of two n
     > You need to have the following installed on your local machine:
     > - [AWS CLI version 2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
-2. Clone the repo:
+2. **Get the repo**:  Clone the repo:
     ```bash
     git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda.git
     ```
 
-3. **Navigate to the Root Directory**: Open your Terminal and navigate to the root folder of the `iac-snowflake-user-rsa_key_pairs_generator-lambda/` repository that you have cloned. You can do this by executing:
+3. **Navigate to the Root Directory**:  Open your Terminal and navigate to the root folder of the `iac-snowflake-user-rsa_key_pairs_generator-lambda/` repository that you have cloned. You can do this by executing:
 
    ```bash
    cd path/to/iac-snowflake-user-rsa_key_pairs_generator-lambda/
@@ -31,7 +31,7 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 
    Replace `path/to/` with the actual path where your repository is located.
 
-4. **Run the Script to Create or Delete the ECR Repository:**  Execute the `deploy.sh` script to create an AWS Elastic Container Registry (ECR) repository, build the AWS Lambda Docker container, and publish it to the newly created ECR repository. This will make the container image available for future deployments.
+4. **Run the Script to Create or Delete the ECR Repository**:  Execute the `deploy.sh` script to create an AWS Elastic Container Registry (ECR) repository, build the AWS Lambda Docker container, and publish it to the newly created ECR repository. This will make the container image available for future deployments.
 
     Use the following command format:
 
@@ -39,7 +39,7 @@ This AWS Lambda function, developed in Python, automates the generation of two n
     ./deploy.sh <create | delete> --profile=<SSO_PROFILE_NAME>
     ```
 
-5. **Replace Argument Placeholders:**
+5. **Replace Argument Placeholders**:
    - `<create | delete>`: Specify either `create` to create the ECR repository or `delete` to remove it.
    - `<SSO_PROFILE_NAME>`: Replace this with your AWS Single Sign-On (SSO) profile name, which identifies your hosted AWS infrastructure.
 
@@ -49,7 +49,7 @@ This AWS Lambda function, developed in Python, automates the generation of two n
     ```
     Replace `my-aws-sso-profile` with your actual AWS SSO profile name.
 
-6. Or, to run the similiar script from GitHub, follow these steps:
+6. **Or, deploy via GitHub**:  To run from GitHub, follow these steps:
 
     a. Deploy the Repository: Ensure that you have cloned or forked the repository to your GitHub account.
 
