@@ -34,7 +34,7 @@ LABEL maintainer=j3@thej3.com \
       description="IaC Snowflake User RSA Key Pairs Generator Lambda"
 
 # Copy code from host into the container
-COPY app.py ${LAMBDA_TASK_ROOT}
+COPY src/app.py ${LAMBDA_TASK_ROOT}
 
 # Set the entrypoint for the container
 CMD ["app.lambda_handler"]

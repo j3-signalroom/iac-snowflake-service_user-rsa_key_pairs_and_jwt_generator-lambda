@@ -13,6 +13,7 @@ __status__     = "dev"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+
 @pytest.fixture(autouse=True)
 def load_configurations():
     """
@@ -26,7 +27,7 @@ def test_generate_rsa_key_pairs():
     """
     Test the RSA key pair generation function.
     """
-    from app import generate_rsa_key_pairs
+    from src.app import generate_rsa_key_pairs
 
     private_key_pem_1_result, public_key_1_pem_result, private_key_pem_2_result, public_key_2_pem_result = generate_rsa_key_pairs()
 
