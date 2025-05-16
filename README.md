@@ -31,12 +31,12 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 
    Replace `path/to/` with the actual path where your repository is located.
 
-4. **Run the Script to Create or Delete the ECR Repository:**  Execute the `deploy-locally.sh` script to create an AWS Elastic Container Registry (ECR) repository, build the AWS Lambda Docker container, and publish it to the newly created ECR repository. This will make the container image available for future deployments.
+4. **Run the Script to Create or Delete the ECR Repository:**  Execute the `deploy.sh` script to create an AWS Elastic Container Registry (ECR) repository, build the AWS Lambda Docker container, and publish it to the newly created ECR repository. This will make the container image available for future deployments.
 
     Use the following command format:
 
     ```bash
-    ./deploy-locally.sh <create | delete> --profile=<SSO_PROFILE_NAME>
+    ./deploy.sh <create | delete> --profile=<SSO_PROFILE_NAME>
     ```
 
 5. **Replace Argument Placeholders:**
@@ -45,7 +45,7 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 
     For example, to create the ECR repository, use the following command:
     ```bash
-    ./deploy-locally.sh create --profile=my-aws-sso-profile
+    ./deploy.sh create --profile=my-aws-sso-profile
     ```
     Replace `my-aws-sso-profile` with your actual AWS SSO profile name.
 
