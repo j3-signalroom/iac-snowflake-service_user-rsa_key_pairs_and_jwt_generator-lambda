@@ -103,7 +103,7 @@ def update_secret(secret_name, secret_value):
             SecretId=secret_name,
             SecretString=json.dumps(secret_value)
         )
-        logging.error("Updated secret: %s", response)
+        logging.info("Updated secret: %s", response)
     except ClientError as e:
         logging.error("Failed to update secret: %s", e)
         raise e
