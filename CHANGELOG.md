@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.44.01.000] - 2025-06-02
+### Changed
+- Issue [#81](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/81)
+
 ## [0.44.00.000] - 2025-05-16
 ### Added
 - Issue [#78](https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda/issues/78)
