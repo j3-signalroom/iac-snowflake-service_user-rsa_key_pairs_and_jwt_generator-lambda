@@ -1,12 +1,12 @@
 # IaC Snowflake User RSA Key Pairs Generator
-This AWS Lambda function, developed in Python, automates the generation of two new [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair), which are essential for enabling secure, public-key authentication for a Snowflake service account user. Given Snowflake's current limitation of allowing a maximum of two RSA key pairs per user, this function supports key-pair rotation to maintain security and compliance standards. Once the RSA key pairs are generated, the function securely stores them in AWS Secrets Manager, leveraging encryption and fine-grained access controls to protect the keys from unauthorized access. This process not only facilitates seamless retrieval and management of the RSA key pairs for future authentication use by the Snowflake service account user but also ensures that the keys are handled in accordance with best practices for cloud security and data protection.
+This AWS Lambda function, developed in Python, automates the generation of up to two new [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair), which are essential for enabling secure, public-key authentication for a Snowflake service account user. Given Snowflake's current limitation of allowing a maximum of two RSA key pairs per user, this function supports key-pair rotation to maintain security and compliance standards. Once the RSA key pairs are generated, the function securely stores them in AWS Secrets Manager, leveraging encryption and fine-grained access controls to protect the keys from unauthorized access. This process not only facilitates seamless retrieval and management of the RSA key pairs for future authentication use by the Snowflake service account user but also ensures that the keys are handled in accordance with best practices for cloud security and data protection.
 
 **Table of Contents**
 
 <!-- toc -->
 + [1.0 Let's get started!](#10-lets-get-started)
+    - [1.1 Deployment Summary](#11-deployment-summary)
 + [2.0 Resources](#20-resources)
-+ [3.0 Conclusion](#30-conclusion)
 <!-- tocstop -->
 
 ## 1.0 Let's get started!
@@ -77,8 +77,9 @@ This AWS Lambda function, developed in Python, automates the generation of two n
 
         ![github-deploy-workflow-screenshot](.blog/images/github-deploy-workflow-screenshot.png)
 
+### 1.1 Deployment Summary
+By following the steps above, you will successfully set up the necessary infrastructure to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake. The process involves creating an AWS Elastic Container Registry (ECR) repository, building the Lambda Docker container, and publishing it to the ECR repository. This setup ensures that the RSA key pairs are securely generated and stored, enabling public-key authentication for your Snowflake service account user.
+
 ## 2.0 Resources
 - [RSA API](https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/)
 
-## 3.0 Conclusion
-By following the steps outlined in this guide, you will successfully set up the necessary infrastructure to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake. The process involves creating an AWS Elastic Container Registry (ECR) repository, building the Lambda Docker container, and publishing it to the ECR repository. This setup ensures that the RSA key pairs are securely generated and stored, enabling public-key authentication for your Snowflake service account user.
