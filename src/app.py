@@ -38,17 +38,17 @@ def lambda_handler(event, context):
         statusCode: 200 for a successfully run of the function.
         body: List of the secret names updated by the function.
     """
-    # Generate RSA key pairs.
-    private_key_pem_1_result, public_key_1_fingerprint, private_key_1, snowflake_public_key_1_pem, private_key_pem_2_result, public_key_2_fingerprint, private_key_2, snowflake_public_key_2_pem = generate_rsa_key_pairs()
+    # Generate key pairs.
+    private_key_pem_1_result, public_key_1_fingerprint, private_key_1, snowflake_public_key_1_pem, private_key_pem_2_result, public_key_2_fingerprint, private_key_2, snowflake_public_key_2_pem = generate_key_pairs()
 
     # Create a dictionary with the root secrets
     root_secret_value = {
         "account": event.get("account"),
         "user": event.get("user"),
         "rsa_public_key_1": snowflake_public_key_1_pem,
-        "public_key_1_fingerprint": generate_jwt(public_key_1_fingerprint, private_key_1, event.get("account"), event.get("user")),
+        "public_key_1_jwt": generate_jwt(public_key_1_fingerprint, private_key_1, event.get("account"), event.get("user")),
         "rsa_public_key_2": snowflake_public_key_2_pem,
-        "public_key_2_fingerprint": generate_jwt(public_key_2_fingerprint, private_key_2, event.get("account"), event.get("user")),
+        "public_key_2_jwt": generate_jwt(public_key_2_fingerprint, private_key_2, event.get("account"), event.get("user")),
     }
     
     root_secret_name = "/snowflake_resource" if event.get("secret_insert", "") == "" else "/snowflake_resource/" + event.get("secret_insert", "")
@@ -114,7 +114,7 @@ def update_secret(secret_name, secret_value):
         raise e
     
 
-def generate_rsa_key_pairs() -> Tuple[str, str, any, str, str, any, str]:
+def generate_key_pairs() -> Tuple[str, str, any, str, str, any, str]:
     """The function uses the `cryptography` library to generate the RSA keys. It creates two private keys,
     each with a size of 2048 bits and a public exponent of 65537. The private keys are serialized
     to PEM format without encryption, and the public keys are also serialized to PEM format.
