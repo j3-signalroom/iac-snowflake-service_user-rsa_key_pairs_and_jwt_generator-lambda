@@ -2,6 +2,8 @@ import json
 import logging
 import pytest
 import requests
+from dotenv import load_dotenv
+import os
 from src.app import generate_key_pairs, generate_jwt
 
 
@@ -17,20 +19,32 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
+# Account Config Keys.
+ACCOUNT_CONFIG = {
+    "organization_name": "organization_name",
+    "account": "account"
+}
+
+# Initialize the global variables.
+account_config = {}
+
 @pytest.fixture(autouse=True)
 def load_configurations():
     """
     Fixture to load configurations before each test.
     """
     # Load configurations here if needed
-    pass
-
+    load_dotenv()
+ 
+    # Set the Snowflake Account Configuration.
+    global account_config
+    account_config[ACCOUNT_CONFIG["organization_name"]] = os.getenv("ORGANIZATION_NAME")
+    account_config[ACCOUNT_CONFIG["account"]] = os.getenv("ACCOUNT")
+    
 
 def test_generate_key_pairs():
     """Test the key pairs generation function.
     """
-    
-
     private_key_pem_1_result, public_key_1_fingerprint, private_key_1, snowflake_public_key_1_pem, private_key_pem_2_result, public_key_2_fingerprint, private_key_2, snowflake_public_key_2_pem = generate_key_pairs()
 
     logger.info("Private Key 1 PEM: \n%s", private_key_pem_1_result)
@@ -58,16 +72,18 @@ def test_restful_api_with_jwt():
 
     _, public_key_1_fingerprint, private_key_1, _, _, _, _, _ = generate_key_pairs()
 
-    account = "VBHCIAO-TDB59559"
-    jwt_token = generate_jwt(public_key_1_fingerprint, private_key_1, account, "TABLEFLOW_KICKSTARTER")
-    url = f"https://{account}.snowflakecomputing.com/api/v2/databases"
+    account_identifier = f"{account_config[ACCOUNT_CONFIG["organization_name"]]}-{account_config[ACCOUNT_CONFIG["account"]]}"
 
-    logger.info("Generated JWT Token: %s", json.loads(jwt_token)['jwt'])  
+    jwt_token = generate_jwt(public_key_1_fingerprint, private_key_1, account_config[ACCOUNT_CONFIG["account"]], "TABLEFLOW_KICKSTARTER")
+    jwt_token = json.loads(jwt_token)['jwt']
+    url = f"https://{account_identifier}.snowflakecomputing.com/api/v2/databases"
+
+    logger.info("Generated JWT Token: %s", jwt_token)  
     logger.info("Request URL: %s", url)
 
     response = requests.get(url=url,
                             headers={"Content-Type": "application/json",
-                                     "Authorization": f"Bearer {json.loads(jwt_token)['jwt']}",
+                                     "Authorization": f"Bearer {jwt_token}",
                                      "Accept": "application/json",
                                      "User-Agent": "Tableflow-AWS-Glue-Kickstarter-External-Volume",
                                      "X-Snowflake-Authorization-Token-Type": "KEYPAIR_JWT"})
