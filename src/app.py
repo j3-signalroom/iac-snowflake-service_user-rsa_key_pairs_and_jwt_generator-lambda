@@ -68,6 +68,17 @@ def lambda_handler(event, context):
         update_secret_string(rsa_private_key_pem_1_branch_secret_name, key_pairs.get_private_key_pem_1())
     except ClientError as e:
         raise e
+    
+    # Store RSA Private Key 1 Branch Secrets in the AWS Secrets Manager
+    try:
+        # Check if the secret already exists
+        rsa_private_key_1_branch_secret_name = f"{root_secret_name}/rsa_private_key_1"
+        boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_1_branch_secret_name)
+
+        # If it exists, update the secret
+        update_secret_binary(rsa_private_key_1_branch_secret_name, key_pairs.get_private_key_1())
+    except ClientError as e:
+        raise e
         
     # Store RSA Private Key PEM 2 Branch Secrets in the AWS Secrets Manager
     try:
@@ -80,9 +91,20 @@ def lambda_handler(event, context):
     except ClientError as e:
         raise e
 
+    # Store RSA Private Key 2 Branch Secrets in the AWS Secrets Manager
+    try:
+        # Check if the secret already exists
+        rsa_private_key_2_branch_secret_name = f"{root_secret_name}/rsa_private_key_2"
+        boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_2_branch_secret_name)
+
+        # If it exists, update the secret
+        update_secret_binary(rsa_private_key_2_branch_secret_name, key_pairs.get_private_key_2())
+    except ClientError as e:
+        raise e
+    
     return {
         'statusCode': 200,
-        'body': json.dumps(f'Root Secrets {root_secret_name}, RSA Private Key PEM 1 Branch Secrets {rsa_private_key_pem_1_branch_secret_name}, and RSA Private Key PEM 2 Branch Secrets {rsa_private_key_pem_2_branch_secret_name} written to Secrets Manager')
+        'body': json.dumps(f'Root Secrets {root_secret_name}, RSA Private Key PEM 1 Branch Secrets {rsa_private_key_pem_1_branch_secret_name}, RSA Private Key PEM 2 Branch Secrets {rsa_private_key_pem_2_branch_secret_name}, RSA Private Key 1 Branch Secrets {rsa_private_key_1_branch_secret_name}, and RSA Private Key 2 Branch Secrets {rsa_private_key_2_branch_secret_name} written to Secrets Manager')
     }
 
 
@@ -102,6 +124,29 @@ def update_secret_string(secret_name, secret_value):
         response = boto3.client('secretsmanager').put_secret_value(
             SecretId=secret_name,
             SecretString=json.dumps(secret_value)
+        )
+        logging.info("Updated secret: %s", response)
+    except ClientError as e:
+        logging.error("Failed to update secret: %s", e)
+        raise e
+
+
+def update_secret_binary(secret_name, secret_value):
+    """
+    Update a secret in AWS Secrets Manager.
+
+    Args:
+        secret_name (string): AWS Secrets Manager secret name.
+        secret_value (bytes): AWS Secrets Manager secret value.
+
+    Raises:
+        e: when an error occurs while making a request to the 
+        AWS Secrets Manager library.
+    """
+    try:
+        response = boto3.client('secretsmanager').put_secret_value(
+            SecretId=secret_name,
+            SecretBinary=secret_value
         )
         logging.info("Updated secret: %s", response)
     except ClientError as e:

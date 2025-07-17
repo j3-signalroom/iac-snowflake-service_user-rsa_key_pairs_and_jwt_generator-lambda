@@ -1,10 +1,13 @@
 import base64
 import hashlib
 from datetime import datetime, timedelta, timezone
+import json
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.hazmat.primitives.asymmetric import rsa
 import jwt
+import boto3
+from botocore.exceptions import ClientError
 
 
 __copyright__  = "Copyright (c) 2025 Jeffrey Jonathan Jennings"
@@ -21,11 +24,15 @@ class GenerateKeyPairs():
     It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
-    def __init__(self, account_identifier: str, user: str):
+    def __init__(self, account_identifier: str, user: str, get_private_keys_from_aws_secrets: bool = False, secret_insert: str = ""):
         self.account_identifier = account_identifier.upper()
         self.user = user.upper()
 
-        self.__generate_key_pairs()
+        if get_private_keys_from_aws_secrets:
+            self.__get_private_keys_from_aws_secrets(secret_insert)
+        else:
+            self.__generate_key_pairs()
+
         self.jwt_token_1 = self.__generate_jwt(self.get_private_key_1(), self.get_private_key_pem_1())
         self.jwt_token_2 = self.__generate_jwt(self.get_private_key_2(), self.get_private_key_pem_2())
 
@@ -175,3 +182,32 @@ class GenerateKeyPairs():
         }
 
         return jwt.encode(payload, key=pem_bytes, algorithm="RS256")
+
+    def __get_private_keys_from_aws_secrets(self, secret_insert: str):
+        """ Retrieve private keys from AWS Secrets Manager. """
+
+        root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
+
+        # Retrieve the private keys from AWS Secrets Manager.
+        secrets = self.__get_aws_secret(root_secret_name)
+        secrets_json = json.loads(secrets)
+        self.account_identifier = secrets_json.get("account", "").upper()
+        self.user = secrets_json.get("user", "").upper()
+        self.private_key_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_1")
+        self.private_key_2 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_2")
+        self.private_key_pem_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_pem_1")
+        self.private_key_pem_2 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_pem_2")
+
+    def __get_aws_secret(self, secret_path: str):
+        try:
+            # Check if the secret already exists
+            response = boto3.client('secretsmanager').get_secret_value(SecretId=secret_path)
+            if 'SecretString' in response:
+                secret = response['SecretString']
+            else:
+                # Handle binary data, potentially base64 decoding
+                secret = response['SecretBinary']
+
+            return secret
+        except ClientError as e:
+            raise e
