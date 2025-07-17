@@ -18,7 +18,7 @@ __status__     = "dev"
 class GenerateKeyPairs():
     """
     This class is responsible for generating RSA key pairs and JWTs for Snowflake authentication.
-    It uses the `cryptography` library to generate the keys and the `jwt` library to create JWTs.
+    It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
     def __init__(self, account_identifier: str, user: str):
