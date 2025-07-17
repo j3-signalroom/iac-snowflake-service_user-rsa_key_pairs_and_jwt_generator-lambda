@@ -47,7 +47,8 @@ def load_configurations():
     account_config[ACCOUNT_CONFIG["organization_name"]] = os.getenv("ORGANIZATION_NAME")
     account_config[ACCOUNT_CONFIG["account"]] = os.getenv("ACCOUNT")
     account_config[ACCOUNT_CONFIG["user"]] = os.getenv("USER")
-    
+    account_config[ACCOUNT_CONFIG["secret_insert"]] = os.getenv("SECRET_INSERT")
+
 
 def test_generate_key_pairs():
     """Test the key pairs generation function.
@@ -71,7 +72,7 @@ def test_generate_key_pairs():
 
 def test_restful_api_with_jwt():
     account_identifier = f"{account_config[ACCOUNT_CONFIG["organization_name"]]}-{account_config[ACCOUNT_CONFIG["account"]]}"
-    key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]])
+    key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]], True, account_config[ACCOUNT_CONFIG["secret_insert"]])
 
     url = f"https://{account_identifier}.snowflakecomputing.com/api/v2/statements"
 
