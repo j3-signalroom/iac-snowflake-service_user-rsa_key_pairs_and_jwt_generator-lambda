@@ -43,9 +43,7 @@ def lambda_handler(event, context):
         "account": event.get("account"),
         "user": event.get("user"),
         "rsa_public_key_1": key_pairs.get_snowflake_public_key_1_pem(),
-        "public_key_1_jwt": key_pairs.get_token_1(),
         "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),
-        "public_key_2_jwt": key_pairs.get_token_2(),
     }
     
     root_secret_name = "/snowflake_resource" if event.get("secret_insert", "") == "" else "/snowflake_resource/" + event.get("secret_insert", "")
@@ -56,7 +54,7 @@ def lambda_handler(event, context):
         boto3.client('secretsmanager').get_secret_value(SecretId=root_secret_name)
 
         # If it exists, update the secret
-        update_secret(root_secret_name, root_secret_value)
+        update_secret_string(root_secret_name, root_secret_value)
     except ClientError as e:
         raise e
         
@@ -67,7 +65,7 @@ def lambda_handler(event, context):
         boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_pem_1_branch_secret_name)
 
         # If it exists, update the secret
-        update_secret(rsa_private_key_pem_1_branch_secret_name, key_pairs.get_private_key_pem_1())
+        update_secret_string(rsa_private_key_pem_1_branch_secret_name, key_pairs.get_private_key_pem_1())
     except ClientError as e:
         raise e
         
@@ -78,7 +76,7 @@ def lambda_handler(event, context):
         boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_pem_2_branch_secret_name)
 
         # If it exists, update the secret
-        update_secret(rsa_private_key_pem_2_branch_secret_name, key_pairs.get_private_key_pem_2())
+        update_secret_string(rsa_private_key_pem_2_branch_secret_name, key_pairs.get_private_key_pem_2())
     except ClientError as e:
         raise e
 
@@ -88,7 +86,7 @@ def lambda_handler(event, context):
     }
 
 
-def update_secret(secret_name, secret_value):
+def update_secret_string(secret_name, secret_value):
     """
     Update a secret in AWS Secrets Manager.
 

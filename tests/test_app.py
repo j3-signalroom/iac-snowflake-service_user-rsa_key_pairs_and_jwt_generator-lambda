@@ -73,18 +73,23 @@ def test_restful_api_with_jwt():
     account_identifier = f"{account_config[ACCOUNT_CONFIG["organization_name"]]}-{account_config[ACCOUNT_CONFIG["account"]]}"
     key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]])
 
-    url = f"https://{account_identifier}.snowflakecomputing.com/api/v2/databases"
+    url = f"https://{account_identifier}.snowflakecomputing.com/api/v2/statements"
 
     logger.info("Generated JWT Token: %s", key_pairs.get_jwt_token_1())  
     logger.info("Request URL: %s", url)
     logger.info("Generated a JWT with the following payload: %s", jwt.decode(key_pairs.get_jwt_token_1(), key=key_pairs.get_private_key_1().public_key(), algorithms=["RS256"]))
 
-    response = requests.get(url=url,
-                            headers={"Content-Type": "application/json",
-                                     "Authorization": f"Bearer {key_pairs.get_jwt_token_1()}",
-                                     "Accept": "application/json",
-                                     "User-Agent": "Tableflow-AWS-Glue-Kickstarter-External-Volume",
-                                     "X-Snowflake-Authorization-Token-Type": "KEYPAIR_JWT"})
+    response = requests.post(url=url,
+                             headers={"Content-Type": "application/json",
+                                      "Authorization": f"Bearer {key_pairs.get_jwt_token_1()}",
+                                      "Accept": "application/json",
+                                      "User-Agent": "Tableflow-AWS-Glue-Kickstarter-External-Volume",
+                                      "X-Snowflake-Authorization-Token-Type": "KEYPAIR_JWT"},
+                             json={"statement": "SELECT CURRENT_USER(), CURRENT_ROLE(), CURRENT_WAREHOUSE()",
+                                   "timeout": 60,
+                                   "resultSetMetaData": {
+                                       "format": "json"
+                                   }})
 
     logger.info("Response Status Code: %s", response.status_code)
     logger.info("Response JSON: %s", response.json())

@@ -18,7 +18,7 @@ __status__     = "dev"
 class GenerateKeyPairs():
     """
     This class is responsible for generating RSA key pairs and JWTs for Snowflake authentication.
-    It uses the `cryptography` library to generate the keys and the `jwt` library to create JWTs.
+    It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
     def __init__(self, account_identifier: str, user: str):
@@ -26,8 +26,8 @@ class GenerateKeyPairs():
         self.user = user.upper()
 
         self.__generate_key_pairs()
-        self.jwt_token_1 = self.__generate_jwt(self.get_private_key_1(), self.get_snowflake_private_key_1_pem())
-        self.jwt_token_2 = self.__generate_jwt(self.get_private_key_2(), self.get_snowflake_private_key_2_pem())
+        self.jwt_token_1 = self.__generate_jwt(self.get_private_key_1(), self.get_private_key_pem_1())
+        self.jwt_token_2 = self.__generate_jwt(self.get_private_key_2(), self.get_private_key_pem_2())
 
     def get_private_key_1(self) -> rsa.RSAPrivateKey:
         """Returns the private key 1."""
@@ -155,7 +155,7 @@ class GenerateKeyPairs():
         # Base64-encode the value and prepend the prefix 'SHA256:'.
         return 'SHA256:' + base64.b64encode(sha256hash.digest()).decode('utf-8')
 
-    def __generate_jwt(self, private_key_pem: bytes, pem: str) -> str:
+    def __generate_jwt(self, pem, pem_bytes: bytes) -> str:
         """ Generate a JSON Web Token (JWT) using the provided public key fingerprint, private key,
         account, and user information.
         """
@@ -168,10 +168,10 @@ class GenerateKeyPairs():
 
         # Create JWT payload
         payload = {
-            "iss": f"{issuer}.{self.__to_public_key_fingerprint(private_key_pem)}",
+            "iss": f"{issuer}.{self.__to_public_key_fingerprint(pem)}",
             "sub": issuer,
-            "iat": now,
-            "exp": now + lifetime
+            "iat": int(now.timestamp()),
+            "exp": int((now + lifetime).timestamp())
         }
 
-        return jwt.encode(payload, key=private_key_pem, algorithm="RS256")
+        return jwt.encode(payload, key=pem_bytes, algorithm="RS256")
