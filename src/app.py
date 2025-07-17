@@ -38,6 +38,8 @@ def lambda_handler(event, context):
     # Generate key pairs.
     key_pairs = GenerateKeyPairs(event.get("account"), event.get("user"))
 
+    root_secret_name = "/snowflake_resource" if event.get("secret_insert", "") == "" else "/snowflake_resource/" + event.get("secret_insert", "")
+
     # Create a dictionary with the root secrets
     root_secret_value = {
         "account": event.get("account"),
@@ -45,67 +47,42 @@ def lambda_handler(event, context):
         "rsa_public_key_1": key_pairs.get_snowflake_public_key_1_pem(),
         "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),
     }
-    
-    root_secret_name = "/snowflake_resource" if event.get("secret_insert", "") == "" else "/snowflake_resource/" + event.get("secret_insert", "")
 
-    # Store root secrets in the AWS Secrets Manager
-    try:
-        # Check if the secret already exists
-        boto3.client('secretsmanager').get_secret_value(SecretId=root_secret_name)
-
-        # If it exists, update the secret
-        update_secret_string(root_secret_name, root_secret_value)
-    except ClientError as e:
-        raise e
-        
-    # Store RSA Private Key PEM 1 Branch Secrets in the AWS Secrets Manager
-    try:
-        # Check if the secret already exists
-        rsa_private_key_pem_1_branch_secret_name = f"{root_secret_name}/rsa_private_key_pem_1"
-        boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_pem_1_branch_secret_name)
-
-        # If it exists, update the secret
-        update_secret_string(rsa_private_key_pem_1_branch_secret_name, key_pairs.get_private_key_pem_1())
-    except ClientError as e:
-        raise e
-    
-    # Store RSA Private Key 1 Branch Secrets in the AWS Secrets Manager
-    try:
-        # Check if the secret already exists
-        rsa_private_key_1_branch_secret_name = f"{root_secret_name}/rsa_private_key_1"
-        boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_1_branch_secret_name)
-
-        # If it exists, update the secret
-        update_secret_binary(rsa_private_key_1_branch_secret_name, key_pairs.get_private_key_1())
-    except ClientError as e:
-        raise e
-        
-    # Store RSA Private Key PEM 2 Branch Secrets in the AWS Secrets Manager
-    try:
-        # Check if the secret already exists
-        rsa_private_key_pem_2_branch_secret_name = f"{root_secret_name}/rsa_private_key_pem_2"
-        boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_pem_2_branch_secret_name)
-
-        # If it exists, update the secret
-        update_secret_string(rsa_private_key_pem_2_branch_secret_name, key_pairs.get_private_key_pem_2())
-    except ClientError as e:
-        raise e
-
-    # Store RSA Private Key 2 Branch Secrets in the AWS Secrets Manager
-    try:
-        # Check if the secret already exists
-        rsa_private_key_2_branch_secret_name = f"{root_secret_name}/rsa_private_key_2"
-        boto3.client('secretsmanager').get_secret_value(SecretId=rsa_private_key_2_branch_secret_name)
-
-        # If it exists, update the secret
-        update_secret_binary(rsa_private_key_2_branch_secret_name, key_pairs.get_private_key_2())
-    except ClientError as e:
-        raise e
+    update_secret(f"{root_secret_name}", root_secret_value, False)
+    update_secret(f"{root_secret_name}/rsa_private_key_pem_1", key_pairs.get_private_key_pem_1(), False)
+    update_secret(f"{root_secret_name}/rsa_private_key_pem_2", key_pairs.get_private_key_pem_2(), False)
+    update_secret(f"{root_secret_name}/rsa_private_key_1", key_pairs.get_private_key_1(), True)
+    update_secret(f"{root_secret_name}/rsa_private_key_2", key_pairs.get_private_key_2(), True)
     
     return {
         'statusCode': 200,
-        'body': json.dumps(f'Root Secrets {root_secret_name}, RSA Private Key PEM 1 Branch Secrets {rsa_private_key_pem_1_branch_secret_name}, RSA Private Key PEM 2 Branch Secrets {rsa_private_key_pem_2_branch_secret_name}, RSA Private Key 1 Branch Secrets {rsa_private_key_1_branch_secret_name}, and RSA Private Key 2 Branch Secrets {rsa_private_key_2_branch_secret_name} written to Secrets Manager')
+        'body': 'success'
     }
+
+
+def update_secret(secret_path: str, secret_value: any, is_binary: bool):
+    """This function updates a secret in AWS Secrets Manager.
+
+    Args:
+        secret_path (str): The path to the secret in AWS Secrets Manager.
+        secret_value (any): The value to be stored in the secret.
+        is_binary (bool): Indicates if the secret value is binary.
+
+    Raises:
+        e: when an error occurs while making a request to the 
+        AWS Secrets Manager library.
+    """
+    try:
+        # Check if the secret already exists
+        boto3.client('secretsmanager').get_secret_value(SecretId=secret_path)
+
+        # If it exists, update the secret
+        if is_binary:
+            update_secret_binary(secret_path, secret_value)
+        else:
+            update_secret_string(secret_path, secret_value)
+    except ClientError as e:
+        raise e
 
 
 def update_secret_string(secret_name, secret_value):
