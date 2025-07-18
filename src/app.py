@@ -20,7 +20,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-
 def lambda_handler(event, context):
     """
     This AWS Lambda function creates two RSA key pairs (public and private), and then securely
@@ -36,18 +35,22 @@ def lambda_handler(event, context):
         body: List of the secret names updated by the function.
     """
     # Generate key pairs.
-    key_pairs = GenerateKeyPairs(event.get("account"), event.get("user"))
+    account_identifier = event.get("account", "").upper()
+    user = event.get("user", "").upper()
+    secret_insert = event.get("secret_insert", "").lower()
+    get_private_keys_from_aws_secrets = event.get("get_private_keys_from_aws_secrets", False)
 
-    root_secret_name = "/snowflake_resource" if event.get("secret_insert", "") == "" else "/snowflake_resource/" + event.get("secret_insert", "")
+    key_pairs = GenerateKeyPairs(account_identifier, user, get_private_keys_from_aws_secrets, secret_insert)
 
     # Create a dictionary with the root secrets
     root_secret_value = {
-        "account": event.get("account"),
-        "user": event.get("user"),
+        "account": account_identifier,
+        "user": user,
         "rsa_public_key_1": key_pairs.get_snowflake_public_key_1_pem(),
         "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),
     }
 
+    root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
     update_secret(f"{root_secret_name}", root_secret_value, False)
     update_secret(f"{root_secret_name}/rsa_private_key_pem_1", key_pairs.get_private_key_pem_1(), False)
     update_secret(f"{root_secret_name}/rsa_private_key_pem_2", key_pairs.get_private_key_pem_2(), False)

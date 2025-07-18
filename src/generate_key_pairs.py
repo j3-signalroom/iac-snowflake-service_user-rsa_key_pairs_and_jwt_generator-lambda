@@ -19,20 +19,28 @@ __status__     = "dev"
 
 
 class GenerateKeyPairs():
-    """
-    This class is responsible for generating RSA key pairs and JWTs for Snowflake authentication.
+    """This class is responsible for generating RSA key pairs and JWTs for Snowflake authentication.
     It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
     def __init__(self, account_identifier: str, user: str, get_private_keys_from_aws_secrets: bool = False, secret_insert: str = ""):
+        """Initialize the GenerateKeyPairs class.
+
+        Args:
+            account_identifier (str): The account identifier for the Snowflake user.
+            user (str): The username for the Snowflake user.
+            get_private_keys_from_aws_secrets (bool): If True, retrieve private keys from AWS Secrets Manager.
+            secret_insert (str): Optional suffix to append to the secret path in AWS Secrets Manager.
+        """
         self.account_identifier = account_identifier.upper()
         self.user = user.upper()
 
         if get_private_keys_from_aws_secrets:
-            self.__get_private_keys_from_aws_secrets(secret_insert)
+            self.__get_private_keys_from_aws_secrets(secret_insert.lower())
         else:
             self.__generate_key_pairs()
 
+        # Generate the JWT tokens using the private keys.
         self.jwt_token_1 = self.__generate_jwt(self.get_private_key_1(), self.get_private_key_pem_1())
         self.jwt_token_2 = self.__generate_jwt(self.get_private_key_2(), self.get_private_key_pem_2())
 
@@ -152,6 +160,14 @@ class GenerateKeyPairs():
         self.snowflake_public_key_2_pem = self.public_key_2_pem_result[27:(len(self.public_key_2_pem_result)-25)].replace("\n", "").replace("\r", "")
 
     def __to_public_key_fingerprint(self, private_key_pem) -> str:
+        """Generate a public key fingerprint from the provided private key PEM.
+
+        Args:
+            private_key_pem (rsa.RSAPrivateKey): The RSA private key used to derive the public key.
+
+        Returns:
+            str: The base64-encoded SHA-256 fingerprint of the public key.
+        """
         # Get the raw bytes of public key.
         public_key_raw = private_key_pem.public_key().public_bytes(Encoding.DER, PublicFormat.SubjectPublicKeyInfo)
 
@@ -163,8 +179,14 @@ class GenerateKeyPairs():
         return 'SHA256:' + base64.b64encode(sha256hash.digest()).decode('utf-8')
 
     def __generate_jwt(self, pem, pem_bytes: bytes) -> str:
-        """ Generate a JSON Web Token (JWT) using the provided public key fingerprint, private key,
-        account, and user information.
+        """Generate a JWT token using the provided private key PEM and account/user information.
+
+        Args:
+            pem (rsa.RSAPrivateKey): The RSA private key used to sign the JWT.
+            pem_bytes (bytes): The PEM-encoded private key bytes.
+
+        Returns:
+            str: The generated JWT token.
         """
         # Create the account identifier.
         issuer = f"{self.account_identifier}.{self.user}"
@@ -184,8 +206,11 @@ class GenerateKeyPairs():
         return jwt.encode(payload, key=pem_bytes, algorithm="RS256")
 
     def __get_private_keys_from_aws_secrets(self, secret_insert: str):
-        """ Retrieve private keys from AWS Secrets Manager. """
+        """Retrieve private keys from AWS Secrets Manager.
 
+        Args:
+            secret_insert (str): Suffix to append to the secret path.
+        """
         root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
 
         # Retrieve the private keys from AWS Secrets Manager.
@@ -199,6 +224,17 @@ class GenerateKeyPairs():
         self.private_key_pem_2 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_pem_2")
 
     def __get_aws_secret(self, secret_path: str):
+        """Retrieve a secret from AWS Secrets Manager.
+
+        Args:
+            secret_path (str): The path to the secret in AWS Secrets Manager.
+
+        Returns:
+            str: The secret value, either as a string or binary data.
+        
+        Raises:
+            ClientError: If there is an error retrieving the secret.
+        """
         try:
             # Check if the secret already exists
             response = boto3.client('secretsmanager').get_secret_value(SecretId=secret_path)
