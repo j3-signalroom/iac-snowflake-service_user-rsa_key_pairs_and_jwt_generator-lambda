@@ -1,5 +1,5 @@
-# IaC Snowflake User RSA Key Pairs Generator
-This AWS Lambda function, developed in Python, automates the generation of up to two new [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair), which are essential for enabling secure, public-key authentication for a Snowflake service account user. Given Snowflake's current limitation of allowing a maximum of two RSA key pairs per user, this function supports key-pair rotation to maintain security and compliance standards. Once the RSA key pairs are generated, the function securely stores them in AWS Secrets Manager, leveraging encryption and fine-grained access controls to protect the keys from unauthorized access. This process not only facilitates seamless retrieval and management of the RSA key pairs for future authentication use by the Snowflake service account user but also ensures that the keys are handled in accordance with best practices for cloud security and data protection.
+# IaC Snowflake User RSA Key Pairs and JWT Generator
+This AWS Lambda function, developed in Python, automates the creation of up to two [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) and a JWT, which are essential for enabling secure, public-key authentication for a Snowflake service account user. Since Snowflake currently limits each user to a maximum of two RSA key pairs, this function supports key rotation to maintain security and compliance. After generating the RSA key pairs, the function securely stores them in AWS Secrets Manager, using encryption and detailed access controls to protect the keys from unauthorized access. This process not only allows for seamless retrieval and management of the RSA key pairs for future authentication by the Snowflake service account user but also ensures that the keys are handled according to best practices for cloud security and data protection.
 
 **Table of Contents**
 
@@ -20,13 +20,13 @@ This AWS Lambda function, developed in Python, automates the generation of up to
 
 2. **Get the repo**:  Clone the repo:
     ```bash
-    git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_generator-lambda.git
+    git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_and_jwt_generator-lambda.git
     ```
 
-3. **Navigate to the Root Directory**:  Open your Terminal and navigate to the root folder of the `iac-snowflake-user-rsa_key_pairs_generator-lambda/` repository that you have cloned. You can do this by executing:
+3. **Navigate to the Root Directory**:  Open your Terminal and navigate to the root folder of the `iac-snowflake-user-rsa_key_pairs_and_jwt_generator-lambda/` repository that you have cloned. You can do this by executing:
 
    ```bash
-   cd path/to/iac-snowflake-user-rsa_key_pairs_generator-lambda/
+   cd path/to/iac-snowflake-user-rsa_key_pairs_and_jwt_generator-lambda/
    ```
 
    Replace `path/to/` with the actual path where your repository is located.
