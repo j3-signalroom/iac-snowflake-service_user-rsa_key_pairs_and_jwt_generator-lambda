@@ -59,6 +59,6 @@ jobs:
           uses: aws-actions/amazon-ecr-login@v2
   
         - name: Delete ECR Repository with any image if exist
-          run: aws ecr delete-repository --repository-name "iac-snowflake-user-rsa_key_pairs_generator" --force || true      
+          run: aws ecr delete-repository --repository-name "iac-snowflake-user-rsa_key_pairs_and_jwt_generator" --force || true      
     
 
