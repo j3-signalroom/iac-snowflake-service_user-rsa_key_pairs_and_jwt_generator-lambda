@@ -26,8 +26,7 @@ logger.setLevel(logging.INFO)
 
 # Account Config Keys.
 ACCOUNT_CONFIG = {
-    "organization_name": "organization_name",
-    "account": "account",
+    "account_identifier": "account_identifier",
     "user": "user",
     "secret_insert": "secret_insert"
 }
@@ -45,8 +44,7 @@ def load_configurations():
  
     # Set the Snowflake Account Configuration.
     global account_config
-    account_config[ACCOUNT_CONFIG["organization_name"]] = os.getenv("ORGANIZATION_NAME")
-    account_config[ACCOUNT_CONFIG["account"]] = os.getenv("ACCOUNT")
+    account_config[ACCOUNT_CONFIG["account_identifier"]] = os.getenv("ACCOUNT_IDENTIFIER")
     account_config[ACCOUNT_CONFIG["user"]] = os.getenv("USER")
     account_config[ACCOUNT_CONFIG["secret_insert"]] = os.getenv("SECRET_INSERT")
 
@@ -54,8 +52,7 @@ def load_configurations():
 def test_generate_key_pairs():
     """Test the key pairs generation function.
     """
-    account_identifier = f"{account_config[ACCOUNT_CONFIG["organization_name"]]}-{account_config[ACCOUNT_CONFIG["account"]]}"
-    key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]])
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["user"]])
 
     logger.info("Snowflake Private Key 1 PEM: \n%s", key_pairs.get_snowflake_private_key_1_pem())
     logger.info("Snowflake Public Key 1 PEM: \n%s", key_pairs.get_snowflake_public_key_1_pem())
@@ -72,8 +69,10 @@ def test_generate_key_pairs():
 
 
 def test_restful_api_with_jwt():
-    account_identifier = f"{account_config[ACCOUNT_CONFIG["organization_name"]]}-{account_config[ACCOUNT_CONFIG["account"]]}"
-    key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]])
+    account_identifier = account_config[ACCOUNT_CONFIG["account_identifier"]]
+    user = account_config[ACCOUNT_CONFIG["user"]]
+
+    key_pairs = GenerateKeyPairs(account_identifier, user)
 
     url = f"https://{account_identifier}.snowflakecomputing.com/api/v2/statements"
 

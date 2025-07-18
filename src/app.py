@@ -35,7 +35,7 @@ def lambda_handler(event, context):
         body: List of the secret names updated by the function.
     """
     # Generate key pairs.
-    account_identifier = event.get("account", "").upper()
+    account_identifier = event.get("account_identifier", "").upper()
     user = event.get("user", "").upper()
     secret_insert = event.get("secret_insert", "").lower()
     get_private_keys_from_aws_secrets = event.get("get_private_keys_from_aws_secrets", False)
@@ -44,7 +44,7 @@ def lambda_handler(event, context):
 
     # Create a dictionary with the root secrets
     root_secret_value = {
-        "account": account_identifier,
+        "account_identifier": account_identifier,
         "user": user,
         "rsa_public_key_1": key_pairs.get_snowflake_public_key_1_pem(),
         "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),

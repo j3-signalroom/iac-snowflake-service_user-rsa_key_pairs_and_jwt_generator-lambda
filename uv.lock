@@ -1,5 +1,5 @@
 version = 1
-requires-python = ">=3.13.5"
+requires-python = ">=3.13.0"
 
 [[package]]
 name = "boto3"
@@ -156,7 +156,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=45.0.5" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "pyjwt", specifier = ">=2.10.1" },
-    { name = "pytest", specifier = ">=8.3.5" },
+    { name = "pytest", specifier = ">=8.4.1" },
     { name = "requests", specifier = ">=2.32.4" },
 ]
 
