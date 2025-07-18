@@ -216,7 +216,7 @@ class GenerateKeyPairs():
         # Retrieve the private keys from AWS Secrets Manager.
         secrets = self.__get_aws_secret(root_secret_name)
         secrets_json = json.loads(secrets)
-        self.account_identifier = secrets_json.get("account", "").upper()
+        self.account_identifier = secrets_json.get("account_identifier", "").upper()
         self.user = secrets_json.get("user", "").upper()
         self.private_key_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_1")
         self.private_key_2 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_2")
