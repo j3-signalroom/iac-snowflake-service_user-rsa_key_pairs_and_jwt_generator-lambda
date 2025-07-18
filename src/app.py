@@ -50,16 +50,36 @@ def lambda_handler(event, context):
         "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),
     }
 
+    # If the secret_insert is empty, use the default root secret name.  Otherwise, append the secret_insert
+    # to the root secret name.
     root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
+
+    # Update the root secret with the account identifier, user, and public keys in the AWS Secrets Manager.
     update_secret(f"{root_secret_name}", root_secret_value, False)
     update_secret(f"{root_secret_name}/rsa_private_key_pem_1", key_pairs.get_private_key_pem_1(), False)
     update_secret(f"{root_secret_name}/rsa_private_key_pem_2", key_pairs.get_private_key_pem_2(), False)
     update_secret(f"{root_secret_name}/rsa_private_key_1", key_pairs.get_private_key_1(), True)
     update_secret(f"{root_secret_name}/rsa_private_key_2", key_pairs.get_private_key_2(), True)
     
+    # Package up all key pairs and tokens into a result dictionary.
+    result = {
+        "account_identifier": account_identifier,
+        "user": user,
+        "root_secret_name": root_secret_name,
+        "rsa_public_key_pem_1": key_pairs.get_snowflake_public_key_1_pem(),
+        "rsa_public_key_pem_2": key_pairs.get_snowflake_public_key_2_pem(),
+        "rsa_private_key_pem_1": key_pairs.get_private_key_pem_1(),
+        "rsa_private_key_pem_2": key_pairs.get_private_key_pem_2(),
+        "rsa_private_key_1": key_pairs.get_private_key_1(),
+        "rsa_private_key_2": key_pairs.get_private_key_2(),
+        "jwt_token_1": key_pairs.get_jwt_token_1(),
+        "jwt_token_2": key_pairs.get_jwt_token_2()
+    }
+
+    # Return the result as a JSON response.
     return {
         'statusCode': 200,
-        'body': 'success'
+        'body': json.dumps(result)
     }
 
 
