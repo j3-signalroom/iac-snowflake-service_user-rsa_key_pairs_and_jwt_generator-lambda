@@ -28,7 +28,8 @@ logger.setLevel(logging.INFO)
 ACCOUNT_CONFIG = {
     "organization_name": "organization_name",
     "account": "account",
-    "user": "user"
+    "user": "user",
+    "secret_insert": "secret_insert"
 }
 
 # Initialize the global variables.
@@ -72,7 +73,7 @@ def test_generate_key_pairs():
 
 def test_restful_api_with_jwt():
     account_identifier = f"{account_config[ACCOUNT_CONFIG["organization_name"]]}-{account_config[ACCOUNT_CONFIG["account"]]}"
-    key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]], True, account_config[ACCOUNT_CONFIG["secret_insert"]])
+    key_pairs = GenerateKeyPairs(account_identifier, account_config[ACCOUNT_CONFIG["user"]])
 
     url = f"https://{account_identifier}.snowflakecomputing.com/api/v2/statements"
 
