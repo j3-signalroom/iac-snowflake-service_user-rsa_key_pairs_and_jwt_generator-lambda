@@ -4,7 +4,7 @@ import boto3
 from botocore.exceptions import ClientError
 import logging
 
-from src.generate_key_pairs import GenerateKeyPairs
+from generate_key_pairs import GenerateKeyPairs
 
 
 __copyright__  = "Copyright (c) 2025 Jeffrey Jonathan Jennings"
