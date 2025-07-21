@@ -1,9 +1,10 @@
 import json
+from typing import Tuple
 import boto3
 from botocore.exceptions import ClientError
 import logging
 
-from generate_key_pairs import GenerateKeyPairs
+from src.generate_key_pairs import GenerateKeyPairs
 
 
 __copyright__  = "Copyright (c) 2025 Jeffrey Jonathan Jennings"
@@ -43,52 +44,26 @@ def lambda_handler(event, context):
 
         key_pairs = GenerateKeyPairs(account_identifier, user, get_private_keys_from_aws_secrets, secret_insert)
 
-        # Create a dictionary with the root secrets
-        root_secret_value = {
-            "account_identifier": account_identifier,
-            "user": user,
-            "rsa_public_key_1": key_pairs.get_snowflake_public_key_1_pem(),
-            "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),
-        }
+        http_status_code, body_json_string, message = update_secrets(key_pairs, account_identifier, user, secret_insert)
 
-        # If the secret_insert is empty, use the default root secret name.  Otherwise, append the secret_insert
-        # to the root secret name.
-        root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
-
-        # Update the root secret with the account identifier, user, and public keys in the AWS Secrets Manager.
-        update_secret(f"{root_secret_name}", root_secret_value, False)
-        update_secret(f"{root_secret_name}/rsa_private_key_pem_1", key_pairs.get_private_key_pem_1(), False)
-        update_secret(f"{root_secret_name}/rsa_private_key_pem_2", key_pairs.get_private_key_pem_2(), False)
-        update_secret(f"{root_secret_name}/rsa_private_key_1", key_pairs.get_private_key_1(), True)
-        update_secret(f"{root_secret_name}/rsa_private_key_2", key_pairs.get_private_key_2(), True)
-        
-        # Package up all key pairs and tokens into a result dictionary.
-        result = {
-            "account_identifier": account_identifier,
-            "user": user,
-            "root_secret_name": root_secret_name,
-            "rsa_public_key_pem_1": key_pairs.get_snowflake_public_key_1_pem(),
-            "rsa_public_key_pem_2": key_pairs.get_snowflake_public_key_2_pem(),
-            "rsa_private_key_pem_1": key_pairs.get_private_key_pem_1(),
-            "rsa_private_key_pem_2": key_pairs.get_private_key_pem_2(),
-            "rsa_private_key_1": key_pairs.get_private_key_1(),
-            "rsa_private_key_2": key_pairs.get_private_key_2(),
-            "jwt_token_1": key_pairs.get_jwt_token_1(),
-            "jwt_token_2": key_pairs.get_jwt_token_2()
-        }
-
-        # Return the result as a JSON response.
         return {
-            'statusCode': 200,
-            'body': json.dumps(result)
+            'statusCode': http_status_code,
+            'body': body_json_string,
+            'message': message
         }
     except Exception as e:
+        # Return an error response.
+        logger.error("Failed to generate keys and tokens.")
+        logger.error("Error details: %s", e)
+        
+        # Return a 500 status code with the error message.
         return {
             'statusCode': 500,
             'body': json.dumps({
                 'status': 'error',
                 'message': str(e)
-            })
+            }),
+            'message': "Failed to generate keys and tokens."
         }
 
 
@@ -114,6 +89,8 @@ def update_secret(secret_path: str, secret_value: any, is_binary: bool):
         else:
             update_secret_string(secret_path, secret_value)
     except ClientError as e:
+        logger.error("Secret %s does not exist. Creating a new secret.", secret_path)
+        logger.error("Error details: %s", e)
         raise e
 
 
@@ -161,3 +138,46 @@ def update_secret_binary(secret_name, secret_value):
     except ClientError as e:
         logging.error("Failed to update secret: %s", e)
         raise e
+
+
+def update_secrets(key_pairs: GenerateKeyPairs, account_identifier: str, user: str, secret_insert: str) -> Tuple[int, str, str]:
+    try:
+        # Create a dictionary with the root secrets
+        root_secret_value = {
+            "account_identifier": account_identifier,
+            "user": user,
+            "rsa_public_key_1": key_pairs.get_snowflake_public_key_1_pem(),
+            "rsa_public_key_2": key_pairs.get_snowflake_public_key_2_pem(),
+        }
+
+        # If the secret_insert is empty, use the default root secret name.  Otherwise, append the secret_insert
+        # to the root secret name.
+        root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
+
+        # Update the root secret with the account identifier, user, and public keys in the AWS Secrets Manager.
+        update_secret(f"{root_secret_name}", root_secret_value, False)
+        update_secret(f"{root_secret_name}/rsa_private_key_pem_1", key_pairs.get_private_key_pem_1(), False)
+        update_secret(f"{root_secret_name}/rsa_private_key_pem_2", key_pairs.get_private_key_pem_2(), False)
+        update_secret(f"{root_secret_name}/rsa_private_key_1", key_pairs.get_private_key_1(), True)
+        update_secret(f"{root_secret_name}/rsa_private_key_2", key_pairs.get_private_key_2(), True)
+        logger.info("Successfully updated secrets in AWS Secrets Manager.")
+        
+        # Package up all key pairs and tokens into a result dictionary.
+        result = {
+            "account_identifier": account_identifier,
+            "user": user,
+            "root_secret_name": root_secret_name,
+            "rsa_public_key_pem_1": key_pairs.get_snowflake_public_key_1_pem(),
+            "rsa_public_key_pem_2": key_pairs.get_snowflake_public_key_2_pem(),
+            "rsa_private_key_pem_1": key_pairs.get_private_key_pem_1(),
+            "rsa_private_key_pem_2": key_pairs.get_private_key_pem_2(),
+            "rsa_private_key_1": key_pairs.get_private_key_1(),
+            "rsa_private_key_2": key_pairs.get_private_key_2(),
+            "jwt_token_1": key_pairs.get_jwt_token_1(),
+            "jwt_token_2": key_pairs.get_jwt_token_2()
+        }
+
+        # Return the result as a JSON response.
+        return 200, json.dumps(result, indent=4, sort_keys=True), "Generated keys and tokens successfully."
+    except Exception as e:
+        return 500, str(e), "Failed to update secrets in AWS Secrets Manager."
