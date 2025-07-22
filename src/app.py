@@ -35,13 +35,25 @@ def lambda_handler(event, context):
         statusCode: 200 for a successfully run of the function.
         body: List of the secret names updated by the function.
     """
+    # Validate the input event.
     try:
         # Generate key pairs.
         account_identifier = event.get("account_identifier", "").upper()
         user = event.get("user", "").upper()
         secret_insert = event.get("secret_insert", "").lower()
         get_private_keys_from_aws_secrets = event.get("get_private_keys_from_aws_secrets", True)
-
+    except KeyError as e:
+        logger.error("Missing required parameter in event: %s", e)
+        return {
+            'statusCode': 400,
+            'body': json.dumps({
+                'status': 'error',
+                'message': f'Missing required parameter: {str(e)}'
+            }),
+            'message': "Missing required parameter."
+        }
+    
+    try:
         key_pairs = GenerateKeyPairs(account_identifier, user, get_private_keys_from_aws_secrets, secret_insert)
 
         http_status_code, body_json_string, message = update_secrets(key_pairs, account_identifier, user, secret_insert)

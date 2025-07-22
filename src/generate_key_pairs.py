@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 import jwt
 import boto3
 from botocore.exceptions import ClientError
+import logging
 
 
 __copyright__  = "Copyright (c) 2025 Jeffrey Jonathan Jennings"
@@ -16,6 +17,12 @@ __license__    = "MIT"
 __maintainer__ = "Jeffrey Jonathan Jennings"
 __email__      = "j3@thej3.com"
 __status__     = "dev"
+
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 class GenerateKeyPairs():
@@ -159,7 +166,7 @@ class GenerateKeyPairs():
         # so only one continuous string remains, which meet Snowflake's requirements
         self.snowflake_public_key_2_pem = self.public_key_2_pem_result[27:(len(self.public_key_2_pem_result)-25)].replace("\n", "").replace("\r", "")
 
-    def __to_public_key_fingerprint(self, private_key_pem) -> str:
+    def __to_public_key_fingerprint(self, private_key_pem: rsa.RSAPrivateKey) -> str:
         """Generate a public key fingerprint from the provided private key PEM.
 
         Args:
@@ -168,7 +175,9 @@ class GenerateKeyPairs():
         Returns:
             str: The base64-encoded SHA-256 fingerprint of the public key.
         """
-        # Get the raw bytes of public key.
+        logger.info("Generating public key fingerprint.")
+
+        # Get the public key from the private key.
         public_key_raw = private_key_pem.public_key().public_bytes(Encoding.DER, PublicFormat.SubjectPublicKeyInfo)
 
         # Get the sha256 hash of the raw bytes.
@@ -178,7 +187,7 @@ class GenerateKeyPairs():
         # Base64-encode the value and prepend the prefix 'SHA256:'.
         return 'SHA256:' + base64.b64encode(sha256hash.digest()).decode('utf-8')
 
-    def __generate_jwt(self, pem, pem_bytes: bytes) -> str:
+    def __generate_jwt(self, pem: rsa.RSAPrivateKey, pem_bytes: bytes) -> str:
         """Generate a JWT token using the provided private key PEM and account/user information.
 
         Args:
@@ -211,6 +220,9 @@ class GenerateKeyPairs():
         Args:
             secret_insert (str): Suffix to append to the secret path.
         """
+        logger.info("Retrieving private keys from AWS Secrets Manager.")
+
+        # Construct the root secret name based on the secret_insert value.
         root_secret_name = "/snowflake_resource" if secret_insert == "" else "/snowflake_resource/" + secret_insert
 
         # Retrieve the private keys from AWS Secrets Manager.
