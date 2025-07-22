@@ -111,9 +111,9 @@ def update_secret_string(secret_name, secret_value):
             SecretId=secret_name,
             SecretString=json.dumps(secret_value)
         )
-        logging.info("Updated secret: %s", response)
+        logging.info("Updated %s secret: %s", secret_name, response)
     except ClientError as e:
-        logging.error("Failed to update secret: %s", e)
+        logging.error("Failed to update %s secret: %s", secret_name, e)
         raise e
 
 
@@ -134,9 +134,9 @@ def update_secret_binary(secret_name, secret_value):
             SecretId=secret_name,
             SecretBinary=secret_value
         )
-        logging.info("Updated secret: %s", response)
+        logging.info("Updated %s secret: %s", secret_name, response)
     except ClientError as e:
-        logging.error("Failed to update secret: %s", e)
+        logging.error("Failed to update %s secret: %s", secret_name, e)
         raise e
 
 
