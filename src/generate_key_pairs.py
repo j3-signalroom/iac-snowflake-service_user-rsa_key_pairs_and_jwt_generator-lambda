@@ -51,6 +51,10 @@ class GenerateKeyPairs():
         logger.info("Snowflake Public Key 1 PEM: \n%s\n", self.get_snowflake_public_key_1_pem())
         logger.info("Snowflake Private Key 2 PEM: \n%s\n", self.get_snowflake_private_key_2_pem())
         logger.info("Snowflake Public Key 2 PEM: \n%s\n", self.get_snowflake_public_key_2_pem())
+        logger.info("Private Key 1: \n%s\n", self.get_private_key_1())
+        logger.info("Private Key 2: \n%s\n", self.get_private_key_2())
+        logger.info("Private Key PEM 1: \n%s\n", self.get_private_key_pem_1())
+        logger.info("Private Key PEM 2: \n%s\n", self.get_private_key_pem_2())
 
         # Generate the JWT tokens using the private keys.
         self.jwt_token_1 = self.__generate_jwt(self.get_private_key_1(), self.get_private_key_pem_1())
