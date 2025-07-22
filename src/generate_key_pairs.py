@@ -175,8 +175,6 @@ class GenerateKeyPairs():
         Returns:
             str: The base64-encoded SHA-256 fingerprint of the public key.
         """
-        logger.info("Generating public key fingerprint.")
-
         # Get the public key from the private key.
         public_key_raw = private_key_pem.public_key().public_bytes(Encoding.DER, PublicFormat.SubjectPublicKeyInfo)
 
@@ -229,7 +227,7 @@ class GenerateKeyPairs():
         secrets = self.__get_aws_secret(root_secret_name)
         secrets_json = json.loads(secrets)
         self.account_identifier = secrets_json.get("account_identifier", "").upper()
-        self.user = secrets_json.get("user", "").upper()
+        self.user = secrets_json.get("snowflake_user", "").upper()
         self.private_key_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_1")
         self.private_key_2 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_2")
         self.private_key_pem_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_pem_1")

@@ -39,7 +39,7 @@ def lambda_handler(event, context):
     try:
         # Generate key pairs.
         account_identifier = event.get("account_identifier", "").upper()
-        user = event.get("user", "").upper()
+        user = event.get("snowflake_user", "").upper()
         secret_insert = event.get("secret_insert", "").lower()
         get_private_keys_from_aws_secrets = event.get("get_private_keys_from_aws_secrets", True)
     except KeyError as e:
