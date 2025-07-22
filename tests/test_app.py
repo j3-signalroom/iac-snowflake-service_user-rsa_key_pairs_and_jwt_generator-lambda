@@ -57,6 +57,10 @@ def test_generate_key_pairs():
     logger.info("Snowflake Public Key 2 PEM: \n%s\n", key_pairs.get_snowflake_public_key_2_pem())
     logger.info("Public Key 1 JWT: \n%s\n", key_pairs.get_jwt_token_1())
     logger.info("Public Key 2 JWT: \n%s\n", key_pairs.get_jwt_token_2())
+    logger.info("Private Key 1: \n%s\n", key_pairs.get_private_key_1())
+    logger.info("Private Key 2: \n%s\n", key_pairs.get_private_key_2())
+    logger.info("Private Key PEM 1: \n%s\n", key_pairs.get_private_key_pem_1())
+    logger.info("Private Key PEM 2: \n%s\n", key_pairs.get_private_key_pem_2())
 
     # Check that the keys are not None
     assert key_pairs.get_snowflake_private_key_1_pem() is not None
