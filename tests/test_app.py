@@ -1,6 +1,8 @@
 import os
 import logging
 import pytest
+import boto3
+from botocore.exceptions import SSOTokenLoadError, ProfileNotFound
 from dotenv import load_dotenv
 
 from src.generate_key_pairs import GenerateKeyPairs
@@ -36,6 +38,10 @@ def load_configurations():
     # Load configurations here if needed
     load_dotenv()
  
+    # Set the AWS profile name for SSO.
+    global sso_profile_name
+    sso_profile_name = os.getenv("SSO_PROFILE_NAME", "")
+
     # Set the Snowflake Account Configuration.
     global account_config
     account_config[ACCOUNT_CONFIG["account_identifier"]] = os.getenv("ACCOUNT_IDENTIFIER")
@@ -69,3 +75,44 @@ def test_generate_key_pairs():
     assert key_pairs.get_snowflake_public_key_2_pem() is not None
     assert key_pairs.get_jwt_token_1() is not None
     assert key_pairs.get_jwt_token_2() is not None
+
+
+def create_sso_session(profile_name: str) -> boto3.Session:
+        """Create SSO session or fail with clear message"""
+        try:
+            session = boto3.Session(profile_name=profile_name)
+            # Validate SSO token by making a call
+            sts = session.client('sts')
+            sts.get_caller_identity()
+            return session
+        except ProfileNotFound:
+            pytest.fail(f"SSO profile '{profile_name}' not found. Configure in ~/.aws/config")
+        except SSOTokenLoadError:
+            pytest.fail(f"SSO token expired for '{profile_name}'. Run: aws sso login --profile {profile_name}")
+
+
+def test_sso_authentication():
+    """Test SSO authentication for each environment"""
+    session = create_sso_session(sso_profile_name)
+    
+    sts = session.client('sts')
+    identity = sts.get_caller_identity()
+    
+    # Verify SSO response structure
+    assert 'Account' in identity
+    assert 'UserId' in identity
+    assert 'Arn' in identity
+    assert 'assumed-role' in identity['Arn']  # SSO always creates assumed roles
+    
+    logger.info(f"Account {identity['Account']}, Role {identity['Arn'].split('/')[-2]}")
+
+
+def test_generate_key_pairs_with_secret_insert():
+    """Test the key pairs generation function with secret insert.
+    """
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]])
+    http_status_code, body_json_string, message = key_pairs.update_secrets()
+
+    logger.info("HTTP Status Code: %s", http_status_code)
+    logger.info("Body JSON String: %s", body_json_string)
+    logger.info("Message: %s", message)
