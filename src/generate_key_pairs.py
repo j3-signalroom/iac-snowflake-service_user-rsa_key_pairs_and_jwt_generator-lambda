@@ -30,22 +30,27 @@ class GenerateKeyPairs():
     It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
-    def __init__(self, account_identifier: str, user: str, get_private_keys_from_aws_secrets: bool = False, secret_insert: str = ""):
+    def __init__(self, account_identifier: str, snowflake_user: str, get_private_keys_from_aws_secrets: bool = False, secret_insert: str = ""):
         """Initialize the GenerateKeyPairs class.
 
         Args:
             account_identifier (str): The account identifier for the Snowflake user.
-            user (str): The username for the Snowflake user.
+            snowflake_user (str): The username for the Snowflake user.
             get_private_keys_from_aws_secrets (bool): If True, retrieve private keys from AWS Secrets Manager.
             secret_insert (str): Optional suffix to append to the secret path in AWS Secrets Manager.
         """
         self.account_identifier = account_identifier.upper()
-        self.user = user.upper()
+        self.snowflake_user = snowflake_user.upper()
 
         if get_private_keys_from_aws_secrets:
             self.__get_private_keys_from_aws_secrets(secret_insert.lower())
         else:
             self.__generate_key_pairs()
+
+        logger.info("Snowflake Private Key 1 PEM: \n%s\n", self.get_snowflake_private_key_1_pem())
+        logger.info("Snowflake Public Key 1 PEM: \n%s\n", self.get_snowflake_public_key_1_pem())
+        logger.info("Snowflake Private Key 2 PEM: \n%s\n", self.get_snowflake_private_key_2_pem())
+        logger.info("Snowflake Public Key 2 PEM: \n%s\n", self.get_snowflake_public_key_2_pem())
 
         # Generate the JWT tokens using the private keys.
         self.jwt_token_1 = self.__generate_jwt(self.get_private_key_1(), self.get_private_key_pem_1())
@@ -196,7 +201,7 @@ class GenerateKeyPairs():
             str: The generated JWT token.
         """
         # Create the account identifier.
-        issuer = f"{self.account_identifier}.{self.user}"
+        issuer = f"{self.account_identifier}.{self.snowflake_user}"
 
         # Get current time in UTC and set JWT lifetime to 59 minutes.
         now = datetime.now(timezone.utc)
@@ -227,7 +232,7 @@ class GenerateKeyPairs():
         secrets = self.__get_aws_secret(root_secret_name)
         secrets_json = json.loads(secrets)
         self.account_identifier = secrets_json.get("account_identifier", "").upper()
-        self.user = secrets_json.get("snowflake_user", "").upper()
+        self.snowflake_user = secrets_json.get("snowflake_user", "").upper()
         self.private_key_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_1")
         self.private_key_2 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_2")
         self.private_key_pem_1 = self.__get_aws_secret(f"{root_secret_name}/rsa_private_key_pem_1")
