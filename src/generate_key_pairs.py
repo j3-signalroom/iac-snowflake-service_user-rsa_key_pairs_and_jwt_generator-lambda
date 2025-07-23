@@ -60,7 +60,7 @@ class GenerateKeyPairs():
         self.rsa_jwt_1 = self.__generate_jwt(self.get_rsa_private_key_1(), self.get_rsa_private_key_pem_1())
         self.rsa_jwt_2 = self.__generate_jwt(self.get_rsa_private_key_2(), self.get_rsa_private_key_pem_2())
 
-    def update_secrets(self, client) -> Tuple[int, str, str]:
+    def update_secrets(self, client) -> Tuple[int, str, Dict]:
         """Update the secrets in AWS Secrets Manager with the generated keys and tokens.
 
         Args:
@@ -88,9 +88,9 @@ class GenerateKeyPairs():
             secrets["rsa_jwt_2"] = self.rsa_jwt_2
             
             # Return the result as a JSON response.
-            return 200, json.dumps(secrets, indent=4, sort_keys=True), "Generated keys and tokens successfully."
-        except Exception as e:
-            return 500, str(e), "Failed to update secrets in AWS Secrets Manager."
+            return 200, "Generated keys and tokens successfully.", secrets
+        except Exception:
+            return 500, "Failed to update secrets in AWS Secrets Manager.", {}
 
     def get_secrets_path(self) -> str:
         """Returns the secrets path."""

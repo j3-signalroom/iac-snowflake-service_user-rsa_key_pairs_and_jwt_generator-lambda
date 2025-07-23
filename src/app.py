@@ -45,20 +45,17 @@ def lambda_handler(event, context):
         logger.error("Missing required parameter in event: %s", e)
         return {
             'statusCode': 400,
-            'body': json.dumps({
-                'status': 'error',
-                'message': f'Missing required parameter: {str(e)}'
-            }),
+            'data': {},
             'message': "Missing required parameter."
         }
     
     try:
         key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, secrets_path, boto3.client('secretsmanager'), get_private_keys_from_aws_secrets)
-        http_status_code, body_json_string, message = key_pairs.update_secrets(boto3.client('secretsmanager'))
+        http_status_code, message, data = key_pairs.update_secrets(boto3.client('secretsmanager'))
 
         return {
             'statusCode': http_status_code,
-            'body': body_json_string,
+            'data': json.loads(data),
             'message': message
         }
     except Exception as e:
@@ -69,9 +66,6 @@ def lambda_handler(event, context):
         # Return a 500 status code with the error message.
         return {
             'statusCode': 500,
-            'body': json.dumps({
-                'status': 'error',
-                'message': str(e)
-            }),
+            'data': {},
             'message': "Failed to generate keys and tokens."
         }
