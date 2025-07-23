@@ -1,3 +1,4 @@
+import json
 import os
 import logging
 import pytest
@@ -113,8 +114,8 @@ def test_generate_key_pairs_with_secret_insert():
     session = create_sso_session(sso_profile_name)
 
     key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]], session.client('secretsmanager'), False)
-    http_status_code, body_json_string, message = key_pairs.update_secrets(session.client('secretsmanager'))
+    http_status_code, message, data = key_pairs.update_secrets(session.client('secretsmanager'))
 
     logger.info("HTTP Status Code: %s", http_status_code)
-    logger.info("Body JSON String: %s", body_json_string)
+    logger.info("JSON: %s", json.dumps(data, indent=4))
     logger.info("Message: %s", message)
