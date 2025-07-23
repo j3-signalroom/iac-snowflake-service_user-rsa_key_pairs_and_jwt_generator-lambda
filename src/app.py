@@ -1,6 +1,4 @@
-import json
 import logging
-
 import boto3
 
 from generate_key_pairs import GenerateKeyPairs
@@ -40,7 +38,6 @@ def lambda_handler(event, context):
         account_identifier = event.get("account_identifier", "").upper()
         snowflake_user = event.get("snowflake_user", "").upper()
         secrets_path = event.get("secrets_path", "").lower()
-        get_private_keys_from_aws_secrets = event.get("get_private_keys_from_aws_secrets", True)
     except KeyError as e:
         logger.error("Missing required parameter in event: %s", e)
         return {
@@ -49,8 +46,12 @@ def lambda_handler(event, context):
             'message': "Missing required parameter."
         }
     
+    logger.info("Account Identifier: %s", account_identifier)
+    logger.info("Snowflake User: %s", snowflake_user)
+    logger.info("Secrets Path: %s", secrets_path)
+
     try:
-        key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, secrets_path, boto3.client('secretsmanager'), get_private_keys_from_aws_secrets)
+        key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, secrets_path)
         http_status_code, message, data = key_pairs.update_secrets(boto3.client('secretsmanager'))
 
         return {
