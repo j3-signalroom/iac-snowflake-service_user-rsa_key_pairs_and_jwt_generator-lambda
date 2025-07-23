@@ -57,24 +57,24 @@ def test_generate_key_pairs():
     """Test the key pairs generation function.
     """
     key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]])
-    logger.info("Snowflake Private Key 1 PEM: \n%s\n", key_pairs.get_snowflake_private_key_1_pem())
-    logger.info("Snowflake Public Key 1 PEM: \n%s\n", key_pairs.get_snowflake_public_key_1_pem())
-    logger.info("Snowflake Private Key 2 PEM: \n%s\n", key_pairs.get_snowflake_private_key_2_pem())
-    logger.info("Snowflake Public Key 2 PEM: \n%s\n", key_pairs.get_snowflake_public_key_2_pem())
-    logger.info("Public Key 1 JWT: \n%s\n", key_pairs.get_jwt_token_1())
-    logger.info("Public Key 2 JWT: \n%s\n", key_pairs.get_jwt_token_2())
-    logger.info("Private Key 1: \n%s\n", key_pairs.get_private_key_1())
-    logger.info("Private Key 2: \n%s\n", key_pairs.get_private_key_2())
-    logger.info("Private Key PEM 1: \n%s\n", key_pairs.get_private_key_pem_1())
-    logger.info("Private Key PEM 2: \n%s\n", key_pairs.get_private_key_pem_2())
+    logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", key_pairs.get_snowflake_rsa_public_key_1_pem())
+    logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", key_pairs.get_snowflake_rsa_public_key_2_pem())
+    logger.info("RSA JWT 1: \n%s\n", key_pairs.get_rsa_jwt_1())
+    logger.info("RSA JWT 2: \n%s\n", key_pairs.get_rsa_jwt_2())
+    logger.info("RSA Private Key 1: \n%s\n", key_pairs.get_rsa_private_key_1())
+    logger.info("RSA Private Key 2: \n%s\n", key_pairs.get_rsa_private_key_2())
+    logger.info("RSA Private Key PEM 1: \n%s\n", key_pairs.get_rsa_private_key_pem_1())
+    logger.info("RSA Private Key PEM 2: \n%s\n", key_pairs.get_rsa_private_key_pem_2())
 
     # Check that the keys are not None
-    assert key_pairs.get_snowflake_private_key_1_pem() is not None
-    assert key_pairs.get_snowflake_public_key_1_pem() is not None
-    assert key_pairs.get_snowflake_private_key_2_pem() is not None
-    assert key_pairs.get_snowflake_public_key_2_pem() is not None
-    assert key_pairs.get_jwt_token_1() is not None
-    assert key_pairs.get_jwt_token_2() is not None
+    assert key_pairs.get_snowflake_rsa_public_key_1_pem() is not None
+    assert key_pairs.get_snowflake_rsa_public_key_2_pem() is not None
+    assert key_pairs.get_rsa_private_key_1() is not None
+    assert key_pairs.get_rsa_private_key_2() is not None
+    assert key_pairs.get_rsa_private_key_pem_1() is not None
+    assert key_pairs.get_rsa_private_key_pem_2() is not None
+    assert key_pairs.get_rsa_jwt_1() is not None
+    assert key_pairs.get_rsa_jwt_2() is not None
 
 
 def create_sso_session(profile_name: str) -> boto3.Session:
@@ -110,8 +110,10 @@ def test_sso_authentication():
 def test_generate_key_pairs_with_secret_insert():
     """Test the key pairs generation function with secret insert.
     """
-    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]])
-    http_status_code, body_json_string, message = key_pairs.update_secrets()
+    session = create_sso_session(sso_profile_name)
+
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], session.client('secretsmanager'), False, account_config[ACCOUNT_CONFIG["secret_insert"]])
+    http_status_code, body_json_string, message = key_pairs.update_secrets(session.client('secretsmanager'))
 
     logger.info("HTTP Status Code: %s", http_status_code)
     logger.info("Body JSON String: %s", body_json_string)

@@ -1,6 +1,8 @@
 import json
 import logging
 
+import boto3
+
 from generate_key_pairs import GenerateKeyPairs
 
 
@@ -51,8 +53,8 @@ def lambda_handler(event, context):
         }
     
     try:
-        key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, get_private_keys_from_aws_secrets, secret_insert)
-        http_status_code, body_json_string, message = key_pairs.update_secrets()
+        key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, boto3.client('secretsmanager'), get_private_keys_from_aws_secrets, secret_insert)
+        http_status_code, body_json_string, message = key_pairs.update_secrets(boto3.client('secretsmanager'))
 
         return {
             'statusCode': http_status_code,
