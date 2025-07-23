@@ -55,7 +55,7 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': http_status_code,
-            'data': json.loads(data),
+            'data': data,
             'message': message
         }
     except Exception as e:
