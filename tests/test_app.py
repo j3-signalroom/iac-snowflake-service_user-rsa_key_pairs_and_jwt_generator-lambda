@@ -64,16 +64,16 @@ def test_generate_key_pairs():
     logger.info("RSA JWT 2: \n%s\n", key_pairs.get_rsa_jwt_2())
     logger.info("RSA Private Key 1: \n%s\n", key_pairs.get_rsa_private_key_1())
     logger.info("RSA Private Key 2: \n%s\n", key_pairs.get_rsa_private_key_2())
-    logger.info("RSA Private Key PEM 1: \n%s\n", key_pairs.get_rsa_private_key_pem_1())
-    logger.info("RSA Private Key PEM 2: \n%s\n", key_pairs.get_rsa_private_key_pem_2())
+    logger.info("RSA Private Key 1 PEM: \n%s\n", key_pairs.get_rsa_private_key_1_pem())
+    logger.info("RSA Private Key 2 PEM: \n%s\n", key_pairs.get_rsa_private_key_2_pem())
 
     # Check that the keys are not None
     assert key_pairs.get_snowflake_rsa_public_key_1_pem() is not None
     assert key_pairs.get_snowflake_rsa_public_key_2_pem() is not None
     assert key_pairs.get_rsa_private_key_1() is not None
     assert key_pairs.get_rsa_private_key_2() is not None
-    assert key_pairs.get_rsa_private_key_pem_1() is not None
-    assert key_pairs.get_rsa_private_key_pem_2() is not None
+    assert key_pairs.get_rsa_private_key_1_pem() is not None
+    assert key_pairs.get_rsa_private_key_2_pem() is not None
     assert key_pairs.get_rsa_jwt_1() is not None
     assert key_pairs.get_rsa_jwt_2() is not None
 
