@@ -48,12 +48,12 @@ class GenerateKeyPairs():
         logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", self.get_snowflake_rsa_public_key_2_pem())
         logger.info("RSA Private Key 1: \n%s\n", self.get_rsa_private_key_1())
         logger.info("RSA Private Key 2: \n%s\n", self.get_rsa_private_key_2())
-        logger.info("RSA Private Key PEM 1: \n%s\n", self.get_rsa_private_key_pem_1())
-        logger.info("RSA Private Key PEM 2: \n%s\n", self.get_rsa_private_key_pem_2())
+        logger.info("RSA Private Key 1 PEM: \n%s\n", self.get_rsa_private_key_1_pem())
+        logger.info("RSA Private Key 2 PEM: \n%s\n", self.get_rsa_private_key_2_pem())
 
         # Generate the JWT tokens using the private keys.
-        self.rsa_jwt_1 = self.__generate_jwt(self.get_rsa_private_key_1(), self.get_rsa_private_key_pem_1())
-        self.rsa_jwt_2 = self.__generate_jwt(self.get_rsa_private_key_2(), self.get_rsa_private_key_pem_2())
+        self.rsa_jwt_1 = self.__generate_jwt(self.get_rsa_private_key_1(), self.get_rsa_private_key_1_pem())
+        self.rsa_jwt_2 = self.__generate_jwt(self.get_rsa_private_key_2(), self.get_rsa_private_key_2_pem())
 
     def update_secrets(self, client) -> Tuple[int, str, Dict]:
         """Update the secrets in AWS Secrets Manager with the generated keys and tokens.
@@ -70,10 +70,10 @@ class GenerateKeyPairs():
                 "account_identifier": self.account_identifier,
                 "snowflake_user": self.snowflake_user,
                 "secrets_path": self.secrets_path,
-                "snowflake_rsa_public_key_1": self.snowflake_rsa_public_key_1_pem,
-                "snowflake_rsa_public_key_2": self.snowflake_rsa_public_key_2_pem,
-                "rsa_private_key_pem_1": base64.b64encode(self.rsa_private_key_pem_1).decode('utf-8'),
-                "rsa_private_key_pem_2": base64.b64encode(self.rsa_private_key_pem_2).decode('utf-8'),
+                "snowflake_rsa_public_key_1_pem": self.snowflake_rsa_public_key_1_pem,
+                "snowflake_rsa_public_key_2_pem": self.snowflake_rsa_public_key_2_pem,
+                "rsa_private_key_1_pem": base64.b64encode(self.rsa_private_key_1_pem).decode('utf-8'),
+                "rsa_private_key_2_pem": base64.b64encode(self.rsa_private_key_2_pem).decode('utf-8'),
             }
 
             # Update the root secret with the account identifier, user, and public keys in the AWS Secrets Manager.
@@ -95,9 +95,9 @@ class GenerateKeyPairs():
         """Returns the RSA private key 1."""
         return self.rsa_private_key_1
 
-    def get_rsa_private_key_pem_1(self) -> bytes:
+    def get_rsa_private_key_1_pem(self) -> bytes:
         """Returns the RSA private key PEM 1."""
-        return self.rsa_private_key_pem_1
+        return self.rsa_private_key_1_pem
 
     def get_snowflake_rsa_public_key_1_pem(self) -> str:
         """Returns the Snowflake public key 1 PEM."""
@@ -111,9 +111,9 @@ class GenerateKeyPairs():
         """Returns the RSA private key 2."""
         return self.rsa_private_key_2
 
-    def get_rsa_private_key_pem_2(self) -> bytes:
+    def get_rsa_private_key_2_pem(self) -> bytes:
         """Returns the RSA private key PEM 2."""
-        return self.rsa_private_key_pem_2
+        return self.rsa_private_key_2_pem
 
     def get_snowflake_rsa_public_key_2_pem(self) -> str:
         """Returns the Snowflake RSA public key 2 PEM."""
@@ -149,7 +149,7 @@ class GenerateKeyPairs():
             public_exponent=65537, 
             key_size=2048
         )
-        self.rsa_private_key_pem_1 = self.rsa_private_key_1.private_bytes(
+        self.rsa_private_key_1_pem = self.rsa_private_key_1.private_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption()
@@ -171,7 +171,7 @@ class GenerateKeyPairs():
             public_exponent=65537, 
             key_size=2048
         )
-        self.rsa_private_key_pem_2 = self.rsa_private_key_2.private_bytes(
+        self.rsa_private_key_2_pem = self.rsa_private_key_2.private_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption()
