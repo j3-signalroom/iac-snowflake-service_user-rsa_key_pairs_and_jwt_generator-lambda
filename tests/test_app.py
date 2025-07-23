@@ -113,7 +113,7 @@ def test_generate_key_pairs_with_secret_insert():
     """
     session = create_sso_session(sso_profile_name)
 
-    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]], session.client('secretsmanager'), False)
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
     http_status_code, message, data = key_pairs.update_secrets(session.client('secretsmanager'))
 
     logger.info("HTTP Status Code: %s", http_status_code)

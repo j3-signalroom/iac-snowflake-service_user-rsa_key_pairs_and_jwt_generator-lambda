@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from typing import Dict, Tuple
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, load_pem_private_key
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.hazmat.primitives.asymmetric import rsa
 import jwt
 from botocore.exceptions import ClientError
@@ -30,24 +30,19 @@ class GenerateKeyPairs():
     It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
-    def __init__(self, account_identifier: str, snowflake_user: str, secrets_path: str, client = None, get_private_keys_from_aws_secrets: bool = False):
+    def __init__(self, account_identifier: str, snowflake_user: str, secrets_path: str):
         """Initialize the GenerateKeyPairs class.
 
         Args:
             account_identifier (str): The account identifier for the Snowflake user.
             snowflake_user (str): The username for the Snowflake user.
             secrets_path (str): The secret path in AWS Secrets Manager.
-            client (boto3.client, optional): Boto3 client for AWS Secrets Manager. If None, a new client is created.
-            get_private_keys_from_aws_secrets (bool, optional): If True, retrieve private keys from AWS Secrets Manager.            
         """
         self.account_identifier = account_identifier.upper()
         self.snowflake_user = snowflake_user.upper()
         self.secrets_path = secrets_path
 
-        if get_private_keys_from_aws_secrets:
-            self.__get_private_keys_from_aws_secrets(client)
-        else:
-            self.__generate_key_pairs()
+        self.__generate_key_pairs()
 
         logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", self.get_snowflake_rsa_public_key_1_pem())
         logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", self.get_snowflake_rsa_public_key_2_pem())
@@ -238,48 +233,6 @@ class GenerateKeyPairs():
         }
 
         return jwt.encode(payload, key=pem_bytes, algorithm="RS256")
-
-    def __get_private_keys_from_aws_secrets(self, client):
-        """Retrieve private keys from AWS Secrets Manager.
-
-        Args:
-            client (boto3.client): Boto3 client for AWS Secrets Manager.
-        """
-        logger.info("Retrieving private keys from AWS Secrets Manager.")
-
-        # Retrieve the private keys from AWS Secrets Manager.
-        secrets = self.__get_aws_secret(client)
-        secrets_json = json.loads(secrets)
-        self.account_identifier = secrets_json.get("account_identifier", "").upper()
-        self.snowflake_user = secrets_json.get("snowflake_user", "").upper()
-        self.snowflake_rsa_public_key_1 = secrets_json.get("snowflake_rsa_public_key_1", "")
-        self.snowflake_rsa_public_key_2 = secrets_json.get("snowflake_rsa_public_key_2", "")
-        self.rsa_private_key_pem_1 = base64.b64decode(secrets_json['rsa_private_key_pem_1'])
-        self.rsa_private_key_pem_2 = base64.b64decode(secrets_json['rsa_private_key_pem_2'])
-        self.rsa_private_key_1 = load_pem_private_key(self.rsa_private_key_pem_1, password=None)
-        self.rsa_private_key_2 = load_pem_private_key(self.rsa_private_key_pem_2, password=None)
-
-    def __get_aws_secret(self, client):
-        """Retrieve a secret from AWS Secrets Manager.
-
-        Args:
-            client (boto3.client): Boto3 client for AWS Secrets Manager.
-
-        Returns:
-            str: The secret value.
-
-        Raises:
-            ClientError: If there is an error retrieving the secret.
-        """
-        try:
-            # Check if the secret already exists
-            response = client.get_secret_value(SecretId=self.secrets_path)
-
-            secret = response['SecretString']
-            
-            return secret
-        except ClientError as e:
-            raise e
 
     def __update_secret(self, client, secrets_path: str, value: Dict):
         """This function updates a secret in AWS Secrets Manager.
