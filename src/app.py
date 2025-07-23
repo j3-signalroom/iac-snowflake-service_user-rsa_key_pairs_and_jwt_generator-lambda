@@ -39,7 +39,7 @@ def lambda_handler(event, context):
         # Generate key pairs.
         account_identifier = event.get("account_identifier", "").upper()
         snowflake_user = event.get("snowflake_user", "").upper()
-        secret_insert = event.get("secret_insert", "").lower()
+        secrets_path = event.get("secrets_path", "").lower()
         get_private_keys_from_aws_secrets = event.get("get_private_keys_from_aws_secrets", True)
     except KeyError as e:
         logger.error("Missing required parameter in event: %s", e)
@@ -53,7 +53,7 @@ def lambda_handler(event, context):
         }
     
     try:
-        key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, boto3.client('secretsmanager'), get_private_keys_from_aws_secrets, secret_insert)
+        key_pairs = GenerateKeyPairs(account_identifier, snowflake_user, secrets_path, boto3.client('secretsmanager'), get_private_keys_from_aws_secrets)
         http_status_code, body_json_string, message = key_pairs.update_secrets(boto3.client('secretsmanager'))
 
         return {
