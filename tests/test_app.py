@@ -3,6 +3,7 @@ import os
 import logging
 import pytest
 import boto3
+import requests
 from botocore.exceptions import SSOTokenLoadError, ProfileNotFound
 from dotenv import load_dotenv
 
@@ -119,3 +120,38 @@ def test_generate_key_pairs_with_secret_insert():
     logger.info("HTTP Status Code: %s", http_status_code)
     logger.info("JSON: %s", json.dumps(data, indent=4))
     logger.info("Message: %s", message)
+
+
+def test_jwt_by_making_restful_call():
+    """Test the JWT by making a RESTful call.
+    """
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
+
+    url = f"https://{account_config[ACCOUNT_CONFIG['account_identifier']]}.snowflakecomputing.com/api/v2/users"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {key_pairs.get_rsa_jwt_1()}",
+        "Accept": "application/json",
+        "User-Agent": "Tableflow-AWS-Glue-Kickstarter-External-Volume",
+        "X-Snowflake-Authorization-Token-Type": "KEYPAIR_JWT"
+    }
+    payload = {
+        "name": account_config[ACCOUNT_CONFIG["snowflake_user"]],
+        "rsa_public_key": key_pairs.get_snowflake_rsa_public_key_1_pem()
+    }
+    response = requests.post(url=url,
+                             headers=headers,
+                             data=payload)
+
+    try:
+        # Raise HTTPError, if occurred.
+        response.raise_for_status()
+
+        logger.info("Response Status Code: %s", response.status_code)
+        logger.info("Response Text: %s", response.text)
+        logger.info("Response JSON: %s", response.json())
+    except requests.exceptions.RequestException as e:
+        logger.error("Request failed: %s", e)
+        logger.error("Response Status Code: %s", response.status_code)
+        logger.error("Response Text: %s", response.text)
+        logger.error("Response JSON: %s", response.json() if response.content else {})
