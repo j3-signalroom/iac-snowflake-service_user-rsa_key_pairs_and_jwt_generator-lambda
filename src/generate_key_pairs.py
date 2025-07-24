@@ -47,6 +47,10 @@ class GenerateKeyPairs():
         logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", self.get_snowflake_rsa_public_key_1_pem())
         logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", self.get_snowflake_rsa_public_key_2_pem())
 
+        # Generate the JWT tokens using the private keys.
+        self.rsa_jwt_1 = self.__generate_jwt(self.rsa_private_key_1, self.rsa_private_key_1_pem)
+        self.rsa_jwt_2 = self.__generate_jwt(self.rsa_private_key_2, self.rsa_private_key_2_pem)
+
     def update_secrets(self, client) -> Tuple[int, str, Dict]:
         """Update the secrets in AWS Secrets Manager with the generated keys and tokens.
 
@@ -76,7 +80,8 @@ class GenerateKeyPairs():
             
             # Return the result as a JSON response.
             return 200, "Generated keys and tokens successfully.", secrets
-        except Exception:
+        except Exception as e:
+            logger.error("Error updating secrets in AWS Secrets Manager: %s", e)
             return 500, "Failed to update secrets in AWS Secrets Manager.", {}
 
     def get_secrets_path(self) -> str:
