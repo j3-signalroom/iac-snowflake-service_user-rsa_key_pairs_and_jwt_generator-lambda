@@ -1,10 +1,11 @@
 import base64
 import hashlib
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone, timedelta
 import json
 from typing import Dict, Tuple
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, load_pem_private_key
 from cryptography.hazmat.primitives.asymmetric import rsa
 import jwt
 from botocore.exceptions import ClientError
@@ -44,12 +45,14 @@ class GenerateKeyPairs():
 
         self.__generate_key_pairs()
 
+        logger.info("RSA Public Key 1 PEM: \n%s\n", self.get_rsa_public_key_1_pem())
+        logger.info("RSA Public Key 2 PEM: \n%s\n", self.get_rsa_public_key_2_pem())
         logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", self.get_snowflake_rsa_public_key_1_pem())
         logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", self.get_snowflake_rsa_public_key_2_pem())
 
         # Generate the JWT tokens using the private keys.
-        self.rsa_jwt_1 = self.__generate_jwt(self.rsa_private_key_1, self.rsa_private_key_1_pem)
-        self.rsa_jwt_2 = self.__generate_jwt(self.rsa_private_key_2, self.rsa_private_key_2_pem)
+        self.rsa_jwt_1 = self.__generate_jwt(self.rsa_private_key_1_pem)
+        self.rsa_jwt_2 = self.__generate_jwt(self.rsa_private_key_2_pem)
 
     def update_secrets(self, client) -> Tuple[int, str, Dict]:
         """Update the secrets in AWS Secrets Manager with the generated keys and tokens.
@@ -66,6 +69,8 @@ class GenerateKeyPairs():
                 "account_identifier": self.account_identifier,
                 "snowflake_user": self.snowflake_user,
                 "secrets_path": self.secrets_path,
+                "rsa_public_key_1_pem": self.public_key_1_pem_result,
+                "rsa_public_key_2_pem": self.public_key_2_pem_result,
                 "snowflake_rsa_public_key_1_pem": self.snowflake_rsa_public_key_1_pem,
                 "snowflake_rsa_public_key_2_pem": self.snowflake_rsa_public_key_2_pem,
                 "rsa_private_key_1_pem": base64.b64encode(self.rsa_private_key_1_pem).decode('utf-8'),
@@ -89,15 +94,19 @@ class GenerateKeyPairs():
         return self.secrets_path
     
     def get_rsa_private_key_1(self) -> rsa.RSAPrivateKey:
-        """Returns the RSA private key 1."""
+        """Returns the RSA Private Key 1."""
         return self.rsa_private_key_1
 
     def get_rsa_private_key_1_pem(self) -> bytes:
-        """Returns the RSA private key PEM 1."""
+        """Returns the RSA Private Key PEM 1."""
         return self.rsa_private_key_1_pem
 
+    def get_rsa_public_key_1_pem(self) -> str:
+        """Returns the RSA Public Key 1 PEM."""
+        return self.public_key_1_pem_result
+    
     def get_snowflake_rsa_public_key_1_pem(self) -> str:
-        """Returns the Snowflake public key 1 PEM."""
+        """Returns the Snowflake Public Key 1 PEM."""
         return self.snowflake_rsa_public_key_1_pem
 
     def get_rsa_jwt_1(self) -> str:
@@ -109,11 +118,15 @@ class GenerateKeyPairs():
         return self.rsa_private_key_2
 
     def get_rsa_private_key_2_pem(self) -> bytes:
-        """Returns the RSA private key PEM 2."""
+        """Returns the RSA Private Key PEM 2."""
         return self.rsa_private_key_2_pem
 
+    def get_rsa_public_key_2_pem(self) -> str:
+        """Returns the RSA Public Key 2 PEM."""
+        return self.public_key_2_pem_result
+
     def get_snowflake_rsa_public_key_2_pem(self) -> str:
-        """Returns the Snowflake RSA public key 2 PEM."""
+        """Returns the Snowflake RSA Public Key 2 PEM."""
         return self.snowflake_rsa_public_key_2_pem
 
     def get_rsa_jwt_2(self) -> str:
@@ -157,11 +170,11 @@ class GenerateKeyPairs():
             encoding=serialization.Encoding.PEM, 
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        public_key_1_pem_result = public_key_pem_1.decode()
+        self.public_key_1_pem_result = public_key_pem_1.decode()
 
         # RSA public key 1; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
         # so only one continuous string remains, which meet Snowflake's requirements
-        self.snowflake_rsa_public_key_1_pem = public_key_1_pem_result[27:(len(public_key_1_pem_result)-25)].replace("\n", "").replace("\r", "")
+        self.snowflake_rsa_public_key_1_pem = self.public_key_1_pem_result[27:(len(self.public_key_1_pem_result)-25)].replace("\n", "").replace("\r", "")
 
         # Generate the private key PEM 2.
         self.rsa_private_key_2 = rsa.generate_private_key(
@@ -179,23 +192,28 @@ class GenerateKeyPairs():
             encoding=serialization.Encoding.PEM, 
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        public_key_2_pem_result = public_key_pem_2.decode()
+        self.public_key_2_pem_result = public_key_pem_2.decode()
 
         # RSA public key 2; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
         # so only one continuous string remains, which meet Snowflake's requirements
-        self.snowflake_rsa_public_key_2_pem = public_key_2_pem_result[27:(len(public_key_2_pem_result)-25)].replace("\n", "").replace("\r", "")
+        self.snowflake_rsa_public_key_2_pem = self.public_key_2_pem_result[27:(len(self.public_key_2_pem_result)-25)].replace("\n", "").replace("\r", "")
 
-    def __to_public_key_fingerprint(self, private_key_pem: rsa.RSAPrivateKey) -> str:
+    def __to_public_key_fingerprint(self, private_key_pem) -> str:
         """Generate a public key fingerprint from the provided private key PEM.
 
         Args:
-            private_key_pem (rsa.RSAPrivateKey): The RSA private key used to derive the public key.
+            private_key_pem (any)): The RSA private key used to derive the public key.
 
         Returns:
             str: The base64-encoded SHA-256 fingerprint of the public key.
         """
+        private_key = load_pem_private_key(private_key_pem, None, default_backend())
+
+        logger.info("Generating public key fingerprint from private key.")
+        logger.info("Private key: %s", private_key)
+
         # Get the public key from the private key.
-        public_key_raw = private_key_pem.public_key().public_bytes(Encoding.DER, PublicFormat.SubjectPublicKeyInfo)
+        public_key_raw = private_key.public_key().public_bytes(Encoding.DER, PublicFormat.SubjectPublicKeyInfo)
 
         # Get the sha256 hash of the raw bytes.
         sha256hash = hashlib.sha256()
@@ -203,13 +221,12 @@ class GenerateKeyPairs():
 
         # Base64-encode the value and prepend the prefix 'SHA256:'.
         return 'SHA256:' + base64.b64encode(sha256hash.digest()).decode('utf-8')
-
-    def __generate_jwt(self, pem: rsa.RSAPrivateKey, pem_bytes: bytes) -> str:
+    
+    def __generate_jwt(self, private_key_pem) -> str:
         """Generate a JWT token using the provided private key PEM and account/user information.
 
         Args:
-            pem (rsa.RSAPrivateKey): The RSA private key used to sign the JWT.
-            pem_bytes (bytes): The PEM-encoded private key bytes.
+            private_key (rsa.RSAPrivateKey): The RSA private key used to sign the JWT.
 
         Returns:
             str: The generated JWT token.
@@ -217,19 +234,17 @@ class GenerateKeyPairs():
         # Create the account identifier.
         issuer = f"{self.account_identifier}.{self.snowflake_user}"
 
-        # Get current time in UTC and set JWT lifetime to 59 minutes.
-        now = datetime.now(timezone.utc)
-        lifetime = timedelta(minutes=59)
-
         # Create JWT payload
         payload = {
-            "iss": f"{issuer}.{self.__to_public_key_fingerprint(pem)}",
+            "iss": f"{issuer}.{self.__to_public_key_fingerprint(private_key_pem)}",
             "sub": issuer,
-            "iat": int(now.timestamp()),
-            "exp": int((now + lifetime).timestamp())
+            "aud": f"https://{self.account_identifier}.snowflakecomputing.com",
+            "iat": int(datetime.now(timezone.utc).timestamp()),
+            "exp": int((datetime.now(timezone.utc) + timedelta(minutes=59)).timestamp())
         }
 
-        return jwt.encode(payload, key=pem_bytes, algorithm="RS256")
+        private_key = load_pem_private_key(private_key_pem, None, default_backend())
+        return jwt.encode(payload, key=private_key, algorithm="RS256")
 
     def __update_secret(self, client, secrets_path: str, value: Dict):
         """This function updates a secret in AWS Secrets Manager.
