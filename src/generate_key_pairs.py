@@ -50,7 +50,7 @@ class GenerateKeyPairs():
         logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", self.get_snowflake_rsa_public_key_1_pem())
         logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", self.get_snowflake_rsa_public_key_2_pem())
 
-        # Generate the JWT tokens using the private keys.
+        # Generate the JWT tokens.
         self.rsa_jwt_1 = self.__generate_jwt(self.rsa_private_key_1_pem)
         self.rsa_jwt_2 = self.__generate_jwt(self.rsa_private_key_2_pem)
 
@@ -77,8 +77,8 @@ class GenerateKeyPairs():
                 "rsa_private_key_2_pem": base64.b64encode(self.rsa_private_key_2_pem).decode('utf-8'),
             }
 
-            # Update the root secret with the account identifier, user, and public keys in the AWS Secrets Manager.
-            self.__update_secret(client, self.secrets_path, secrets)
+            # Update Secrets Path, Account Identifier, Snowflake User and Key Pairs in AWS Secrets Manager.
+            self.__update_secrets_manager(client, self.secrets_path, secrets)
 
             secrets["rsa_jwt_1"] = self.rsa_jwt_1
             secrets["rsa_jwt_2"] = self.rsa_jwt_2
@@ -103,7 +103,7 @@ class GenerateKeyPairs():
 
     def get_rsa_public_key_1_pem(self) -> str:
         """Returns the RSA Public Key 1 PEM."""
-        return self.public_key_1_pem_result
+        return self.rsa_public_key_pem_1
     
     def get_snowflake_rsa_public_key_1_pem(self) -> str:
         """Returns the Snowflake Public Key 1 PEM."""
@@ -123,7 +123,7 @@ class GenerateKeyPairs():
 
     def get_rsa_public_key_2_pem(self) -> str:
         """Returns the RSA Public Key 2 PEM."""
-        return self.public_key_2_pem_result
+        return self.rsa_public_key_pem_2
 
     def get_snowflake_rsa_public_key_2_pem(self) -> str:
         """Returns the Snowflake RSA Public Key 2 PEM."""
@@ -166,15 +166,14 @@ class GenerateKeyPairs():
         )
 
         # Generate the public key PEM 1.
-        public_key_pem_1 = self.rsa_private_key_1.public_key().public_bytes(
+        self.rsa_public_key_pem_1 = self.rsa_private_key_1.public_key().public_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
-        self.public_key_1_pem_result = public_key_pem_1.decode()
+        ).decode()
 
-        # RSA public key 1; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
-        # so only one continuous string remains, which meet Snowflake's requirements
-        self.snowflake_rsa_public_key_1_pem = self.public_key_1_pem_result[27:(len(self.public_key_1_pem_result)-25)].replace("\n", "").replace("\r", "")
+        # RSA public key 1; used for key-pair authentication.  To meet Snowflake's requirements line-feeds, carriage returns,
+        # and the header and footer are striped from the PEM.
+        self.snowflake_rsa_public_key_1_pem = self.rsa_public_key_pem_1[27:(len(self.rsa_public_key_pem_1)-25)].replace("\n", "").replace("\r", "")
 
         # Generate the private key PEM 2.
         self.rsa_private_key_2 = rsa.generate_private_key(
@@ -188,15 +187,14 @@ class GenerateKeyPairs():
         )
 
         # Generate the public key PEM 2.
-        public_key_pem_2 = self.rsa_private_key_2.public_key().public_bytes(
+        self.rsa_public_key_pem_2 = self.rsa_private_key_2.public_key().public_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PublicFormat.SubjectPublicKeyInfo
-        )
-        self.public_key_2_pem_result = public_key_pem_2.decode()
+        ).decode()
 
-        # RSA public key 2; used for key-pair authentication.  Strips line-feeds, carriage returns, and the header and footer.
-        # so only one continuous string remains, which meet Snowflake's requirements
-        self.snowflake_rsa_public_key_2_pem = self.public_key_2_pem_result[27:(len(self.public_key_2_pem_result)-25)].replace("\n", "").replace("\r", "")
+        # RSA public key 2; used for key-pair authentication.  To meet Snowflake's requirements line-feeds, carriage returns,
+        # and the header and footer are striped from the PEM. 
+        self.snowflake_rsa_public_key_2_pem = self.rsa_public_key_pem_2[27:(len(self.rsa_public_key_pem_2)-25)].replace("\n", "").replace("\r", "")
 
     def __to_public_key_fingerprint(self, private_key_pem) -> str:
         """Generate a public key fingerprint from the provided private key PEM.
@@ -246,13 +244,13 @@ class GenerateKeyPairs():
         private_key = load_pem_private_key(private_key_pem, None, default_backend())
         return jwt.encode(payload, key=private_key, algorithm="RS256")
 
-    def __update_secret(self, client, secrets_path: str, value: Dict):
-        """This function updates a secret in AWS Secrets Manager.
+    def __update_secrets_manager(self, client, secrets_path: str, secrets: Dict):
+        """This function updates the secrets in AWS Secrets Manager.
 
         Args:
             client (boto3.client): Boto3 client for AWS Secrets Manager.
             secrets_path (str): The path to the secrets in AWS Secrets Manager.
-            value (Dict): The value to be stored in the secret.
+            secrets (Dict): The secrets to be stored in the secret.
         """
         try:
             # Check if the secret already exists
@@ -262,7 +260,7 @@ class GenerateKeyPairs():
             try:
                 response = client.put_secret_value(
                     SecretId=secrets_path,
-                    SecretString=json.dumps(value)
+                    SecretString=json.dumps(secrets)
                 )
                 logging.info("Updated %s secret: %s", secrets_path, response)
             except ClientError as e:
@@ -270,7 +268,7 @@ class GenerateKeyPairs():
         except ClientError:
             logger.info("Secret %s does not exist. Creating a new secret.", secrets_path)
             try:
-                response = client.create_secret(Name=secrets_path, SecretString=json.dumps(value))
+                response = client.create_secret(Name=secrets_path, SecretString=json.dumps(secrets))
                 logger.info("Secret %s created successfully.", secrets_path)
                 logger.info("Secret ARN: %s", response['ARN'])
             except ClientError as e:
