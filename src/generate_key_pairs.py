@@ -69,8 +69,8 @@ class GenerateKeyPairs():
                 "account_identifier": self.account_identifier,
                 "snowflake_user": self.snowflake_user,
                 "secrets_path": self.secrets_path,
-                "rsa_public_key_1_pem": self.public_key_1_pem_result,
-                "rsa_public_key_2_pem": self.public_key_2_pem_result,
+                "rsa_public_key_1_pem": self.rsa_public_key_1_pem,
+                "rsa_public_key_2_pem": self.rsa_public_key_2_pem,
                 "snowflake_rsa_public_key_1_pem": self.snowflake_rsa_public_key_1_pem,
                 "snowflake_rsa_public_key_2_pem": self.snowflake_rsa_public_key_2_pem,
                 "rsa_private_key_1_pem": base64.b64encode(self.rsa_private_key_1_pem).decode('utf-8'),
@@ -103,7 +103,7 @@ class GenerateKeyPairs():
 
     def get_rsa_public_key_1_pem(self) -> str:
         """Returns the RSA Public Key 1 PEM."""
-        return self.rsa_public_key_pem_1
+        return self.rsa_public_key_1_pem
     
     def get_snowflake_rsa_public_key_1_pem(self) -> str:
         """Returns the Snowflake Public Key 1 PEM."""
@@ -123,7 +123,7 @@ class GenerateKeyPairs():
 
     def get_rsa_public_key_2_pem(self) -> str:
         """Returns the RSA Public Key 2 PEM."""
-        return self.rsa_public_key_pem_2
+        return self.rsa_public_key_2_pem
 
     def get_snowflake_rsa_public_key_2_pem(self) -> str:
         """Returns the Snowflake RSA Public Key 2 PEM."""
@@ -154,47 +154,51 @@ class GenerateKeyPairs():
         storage in AWS Secrets Manager. The fingerprints are base64-encoded SHA-256 hashes of the
         public keys in DER format.
         """
-        # Generate the private key PEM 1.
+        # Generate the RSA Private Key 1.
         self.rsa_private_key_1 = rsa.generate_private_key(
             public_exponent=65537, 
             key_size=2048
         )
+
+        # Generate the RSA Private Key 1 PEM.
         self.rsa_private_key_1_pem = self.rsa_private_key_1.private_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption()
         )
 
-        # Generate the public key PEM 1.
-        self.rsa_public_key_pem_1 = self.rsa_private_key_1.public_key().public_bytes(
+        # Generate the RSA Public Key 1 PEM.
+        self.rsa_public_key_1_pem = self.rsa_private_key_1.public_key().public_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         ).decode()
 
-        # RSA public key 1; used for key-pair authentication.  To meet Snowflake's requirements line-feeds, carriage returns,
+        # Snowflake RSA Public Key 1; used for key-pair authentication.  To meet Snowflake's requirements line-feeds, carriage returns,
         # and the header and footer are striped from the PEM.
-        self.snowflake_rsa_public_key_1_pem = self.rsa_public_key_pem_1[27:(len(self.rsa_public_key_pem_1)-25)].replace("\n", "").replace("\r", "")
+        self.snowflake_rsa_public_key_1_pem = self.rsa_public_key_1_pem[27:(len(self.rsa_public_key_1_pem)-25)].replace("\n", "").replace("\r", "")
 
-        # Generate the private key PEM 2.
+        # Generate the RSA Private Key 2.
         self.rsa_private_key_2 = rsa.generate_private_key(
             public_exponent=65537, 
             key_size=2048
         )
+
+        # Generate the RSA Private Key 2 PEM.
         self.rsa_private_key_2_pem = self.rsa_private_key_2.private_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption()
         )
 
-        # Generate the public key PEM 2.
-        self.rsa_public_key_pem_2 = self.rsa_private_key_2.public_key().public_bytes(
+        # Generate the RSA Public Key 2 PEM.
+        self.rsa_public_key_2_pem = self.rsa_private_key_2.public_key().public_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         ).decode()
 
-        # RSA public key 2; used for key-pair authentication.  To meet Snowflake's requirements line-feeds, carriage returns,
-        # and the header and footer are striped from the PEM. 
-        self.snowflake_rsa_public_key_2_pem = self.rsa_public_key_pem_2[27:(len(self.rsa_public_key_pem_2)-25)].replace("\n", "").replace("\r", "")
+        # Snowflake RSA Public Key 2; used for key-pair authentication.  To meet Snowflake's requirements line-feeds, carriage returns,
+        # and the header and footer are striped from the PEM.
+        self.snowflake_rsa_public_key_2_pem = self.rsa_public_key_2_pem[27:(len(self.rsa_public_key_2_pem)-25)].replace("\n", "").replace("\r", "")
 
     def __to_public_key_fingerprint(self, private_key_pem) -> str:
         """Generate a public key fingerprint from the provided private key PEM.
