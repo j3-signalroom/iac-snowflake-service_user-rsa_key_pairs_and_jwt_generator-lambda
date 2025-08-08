@@ -31,15 +31,15 @@ class GenerateKeyPairs():
     It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
-    def __init__(self, account_identifier: str, snowflake_user: str, secrets_path: str):
+    def __init__(self, snowflake_account_identifier: str, snowflake_user: str, secrets_path: str):
         """Initialize the GenerateKeyPairs class.
 
         Args:
-            account_identifier (str): The account identifier for the Snowflake user.
+            snowflake_account_identifier (str): The account identifier for the Snowflake user.
             snowflake_user (str): The username for the Snowflake user.
             secrets_path (str): The secret path in AWS Secrets Manager.
         """
-        self.account_identifier = account_identifier.upper()
+        self.snowflake_account_identifier = snowflake_account_identifier.upper()
         self.snowflake_user = snowflake_user.upper()
         self.secrets_path = secrets_path
 
@@ -51,8 +51,8 @@ class GenerateKeyPairs():
         logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", self.get_snowflake_rsa_public_key_2_pem())
 
         # Generate the JWT tokens.
-        self.rsa_jwt_1 = self.__generate_jwt(self.rsa_private_key_1_pem)
-        self.rsa_jwt_2 = self.__generate_jwt(self.rsa_private_key_2_pem)
+        self.snowflake_rsa_jwt_1 = self.__generate_jwt(self.snowflake_rsa_private_key_1_pem)
+        self.snowflake_rsa_jwt_2 = self.__generate_jwt(self.snowflake_rsa_private_key_2_pem)
 
     def update_secrets(self, client) -> Tuple[int, str, Dict]:
         """Update the secrets in AWS Secrets Manager with the generated keys and tokens.
@@ -66,22 +66,22 @@ class GenerateKeyPairs():
         try:
             # Create a dictionary with the root secrets
             secrets = {
-                "account_identifier": self.account_identifier,
+                "snowflake_account_identifier": self.snowflake_account_identifier,
                 "snowflake_user": self.snowflake_user,
                 "secrets_path": self.secrets_path,
                 "rsa_public_key_1_pem": self.rsa_public_key_1_pem,
                 "rsa_public_key_2_pem": self.rsa_public_key_2_pem,
                 "snowflake_rsa_public_key_1_pem": self.snowflake_rsa_public_key_1_pem,
                 "snowflake_rsa_public_key_2_pem": self.snowflake_rsa_public_key_2_pem,
-                "rsa_private_key_1_pem": base64.b64encode(self.rsa_private_key_1_pem).decode('utf-8'),
-                "rsa_private_key_2_pem": base64.b64encode(self.rsa_private_key_2_pem).decode('utf-8'),
+                "snowflake_rsa_private_key_1_pem": base64.b64encode(self.snowflake_rsa_private_key_1_pem).decode('utf-8'),
+                "snowflake_rsa_private_key_2_pem": base64.b64encode(self.snowflake_rsa_private_key_2_pem).decode('utf-8'),
             }
 
             # Update Secrets Path, Account Identifier, Snowflake User and Key Pairs in AWS Secrets Manager.
             self.__update_secrets_manager(client, self.secrets_path, secrets)
 
-            secrets["rsa_jwt_1"] = self.rsa_jwt_1
-            secrets["rsa_jwt_2"] = self.rsa_jwt_2
+            secrets["snowflake_rsa_jwt_1"] = self.snowflake_rsa_jwt_1
+            secrets["snowflake_rsa_jwt_2"] = self.snowflake_rsa_jwt_2
             
             # Return the result as a JSON response.
             return 200, "Generated keys and tokens successfully.", secrets
@@ -99,7 +99,7 @@ class GenerateKeyPairs():
 
     def get_rsa_private_key_1_pem(self) -> bytes:
         """Returns the RSA Private Key PEM 1."""
-        return self.rsa_private_key_1_pem
+        return self.snowflake_rsa_private_key_1_pem
 
     def get_rsa_public_key_1_pem(self) -> str:
         """Returns the RSA Public Key 1 PEM."""
@@ -111,7 +111,7 @@ class GenerateKeyPairs():
 
     def get_rsa_jwt_1(self) -> str:
         """Returns the generated RSA JWT token 1."""
-        return self.rsa_jwt_1
+        return self.snowflake_rsa_jwt_1
 
     def get_rsa_private_key_2(self) -> rsa.RSAPrivateKey:
         """Returns the RSA private key 2."""
@@ -119,7 +119,7 @@ class GenerateKeyPairs():
 
     def get_rsa_private_key_2_pem(self) -> bytes:
         """Returns the RSA Private Key PEM 2."""
-        return self.rsa_private_key_2_pem
+        return self.snowflake_rsa_private_key_2_pem
 
     def get_rsa_public_key_2_pem(self) -> str:
         """Returns the RSA Public Key 2 PEM."""
@@ -131,7 +131,7 @@ class GenerateKeyPairs():
 
     def get_rsa_jwt_2(self) -> str:
         """Returns the generated RSA JWT token 2."""
-        return self.rsa_jwt_2
+        return self.snowflake_rsa_jwt_2
 
 
     def __generate_key_pairs(self):
@@ -161,7 +161,7 @@ class GenerateKeyPairs():
         )
 
         # Generate the RSA Private Key 1 PEM.
-        self.rsa_private_key_1_pem = self.rsa_private_key_1.private_bytes(
+        self.snowflake_rsa_private_key_1_pem = self.rsa_private_key_1.private_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption()
@@ -184,7 +184,7 @@ class GenerateKeyPairs():
         )
 
         # Generate the RSA Private Key 2 PEM.
-        self.rsa_private_key_2_pem = self.rsa_private_key_2.private_bytes(
+        self.snowflake_rsa_private_key_2_pem = self.rsa_private_key_2.private_bytes(
             encoding=serialization.Encoding.PEM, 
             format=serialization.PrivateFormat.PKCS8, 
             encryption_algorithm=serialization.NoEncryption()
@@ -234,13 +234,13 @@ class GenerateKeyPairs():
             str: The generated JWT token.
         """
         # Create the account identifier.
-        issuer = f"{self.account_identifier}.{self.snowflake_user}"
+        issuer = f"{self.snowflake_account_identifier}.{self.snowflake_user}"
 
         # Create JWT payload
         payload = {
             "iss": f"{issuer}.{self.__to_public_key_fingerprint(private_key_pem)}",
             "sub": issuer,
-            "aud": f"https://{self.account_identifier}.snowflakecomputing.com",
+            "aud": f"https://{self.snowflake_account_identifier}.snowflakecomputing.com",
             "iat": int(datetime.now(timezone.utc).timestamp()),
             "exp": int((datetime.now(timezone.utc) + timedelta(minutes=59)).timestamp())
         }
