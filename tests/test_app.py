@@ -45,11 +45,11 @@ def load_configurations():
 
     # Set the Snowflake Account Configuration.
     global account_config
-    account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]] = os.getenv("ACCOUNT_IDENTIFIER")
+    account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]] = os.getenv("SNOWFLAKE_ACCOUNT_IDENTIFIER")
     account_config[ACCOUNT_CONFIG["snowflake_user"]] = os.getenv("SNOWFLAKE_USER")
     account_config[ACCOUNT_CONFIG["secrets_path"]] = os.getenv("SECRETS_PATH")
 
-    logger.info("Account Identifier: %s", account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]])
+    logger.info("Snowflake Account Identifier: %s", account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]])
     logger.info("Snowflake User: %s", account_config[ACCOUNT_CONFIG["snowflake_user"]])
     logger.info("Secrets Path: %s", account_config[ACCOUNT_CONFIG["secrets_path"]])
 

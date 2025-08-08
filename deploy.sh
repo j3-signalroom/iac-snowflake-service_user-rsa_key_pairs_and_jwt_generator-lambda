@@ -79,13 +79,4 @@ then
 else
     # Force the delete of the ECR Repository
     aws ecr delete-repository --repository-name ${repo_name} ${AWS_PROFILE} --force || true
-
-    # Read SECRETS_PATH from the .env file
-    SECRETS_PATH=$(grep "^SECRETS_PATH=" .env | cut -d'=' -f2)
-
-    # Set the Snowflake secrets path to lower case
-    snowflake_secrets_path=$(echo $SECRETS_PATH | tr '[:upper:]' '[:lower:]')
-
-    # Force the delete of the AWS Secrets
-    aws secretsmanager delete-secret --secret-id ${snowflake_secrets_path} --force-delete-without-recovery || true
 fi
