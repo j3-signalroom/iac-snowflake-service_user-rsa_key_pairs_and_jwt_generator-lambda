@@ -23,7 +23,7 @@ logger.setLevel(logging.INFO)
 
 # Account Config Keys.
 ACCOUNT_CONFIG = {
-    "account_identifier": "account_identifier",
+    "snowflake_account_identifier": "snowflake_account_identifier",
     "snowflake_user": "snowflake_user",
     "secrets_path": "secrets_path"
 }
@@ -45,11 +45,11 @@ def load_configurations():
 
     # Set the Snowflake Account Configuration.
     global account_config
-    account_config[ACCOUNT_CONFIG["account_identifier"]] = os.getenv("ACCOUNT_IDENTIFIER")
+    account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]] = os.getenv("ACCOUNT_IDENTIFIER")
     account_config[ACCOUNT_CONFIG["snowflake_user"]] = os.getenv("SNOWFLAKE_USER")
     account_config[ACCOUNT_CONFIG["secrets_path"]] = os.getenv("SECRETS_PATH")
 
-    logger.info("Account Identifier: %s", account_config[ACCOUNT_CONFIG["account_identifier"]])
+    logger.info("Account Identifier: %s", account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]])
     logger.info("Snowflake User: %s", account_config[ACCOUNT_CONFIG["snowflake_user"]])
     logger.info("Secrets Path: %s", account_config[ACCOUNT_CONFIG["secrets_path"]])
 
@@ -57,7 +57,7 @@ def load_configurations():
 def test_generate_key_pairs():
     """Test the key pairs generation function.
     """
-    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
     logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", key_pairs.get_snowflake_rsa_public_key_1_pem())
     logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", key_pairs.get_snowflake_rsa_public_key_2_pem())
     logger.info("RSA JWT 1: \n%s\n", key_pairs.get_rsa_jwt_1())
@@ -113,7 +113,7 @@ def test_generate_key_pairs_with_secret_insert():
     """
     session = create_sso_session(sso_profile_name)
 
-    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
+    key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
     http_status_code, message, data = key_pairs.update_secrets(session.client('secretsmanager'))
 
     logger.info("HTTP Status Code: %s", http_status_code)
