@@ -6,7 +6,8 @@ This AWS Lambda function, developed in Python, automates the creation of up to t
 <!-- toc -->
 + [1.0 Let's get started!](#10-lets-get-started)
     - [1.1 Deployment Summary](#11-deployment-summary)
-+ [2.0 Resources](#20-resources)
++ [2.0 Testing](#20-testing)
++ [3.0 Resources](#30-resources)
 <!-- tocstop -->
 
 ## 1.0 Let's get started!
@@ -78,8 +79,31 @@ This AWS Lambda function, developed in Python, automates the creation of up to t
         ![github-deploy-workflow-screenshot](.blog/images/github-deploy-workflow-screenshot.png)
 
 ### 1.1 Deployment Summary
-By following the steps above, you will successfully set up the necessary infrastructure to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake. The process involves creating an AWS Elastic Container Registry (ECR) repository, building the Lambda Docker container, and publishing it to the ECR repository. This setup ensures that the RSA key pairs are securely generated and stored, enabling public-key authentication for your Snowflake service account user.
+By following the steps above, you will effectively establish the infrastructure needed to build and deploy the Lambda function container for secure RSA key pair generation in Snowflake. The process involves creating an AWS Elastic Container Registry (ECR) repository, building the Lambda Docker container, and publishing it to the ECR repository. This setup guarantees that the RSA key pairs are securely generated and stored, enabling public-key authentication for your Snowflake service account user.
 
-## 2.0 Resources
+## 2.0 Testing
+To test the generation of RSA key pairs, you can use the provided test script located in the `tests/` directory. The script will help you verify that the key pairs are generated correctly, meet the required specifications, and can be successfully stored in AWS Secrets Manager. To use the test script, create a `.env` file in the root directory of the project. Then, configure it with the appropriate AWS SSO Profile Name and settings, as follows:
+
+```bash
+SNOWFLAKE_ACCOUNT_IDENTIFIER=<SNOWFLAKE_ACCOUNT_IDENTIFIER>
+SNOWFLAKE_USER=<SNOWFLAKE_USER>
+SECRETS_PATH=<SECRETS_PATH>
+SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
+```
+
+Environment Variable|Description
+---|---
+SNOWFLAKE_ACCOUNT_IDENTIFIER|The Snowflake account identifier.
+SNOWFLAKE_USER|The Snowflake user name.
+SECRETS_PATH|The path to the AWS Secrets Manager secrets.
+SSO_PROFILE_NAME|Your AWS SSO profile name.
+
+You can execute the test script with this command:
+
+```bash
+pytest -s tests/test_app.py
+```
+
+## 3.0 Resources
 - [RSA API](https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/)
 
