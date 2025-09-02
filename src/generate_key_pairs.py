@@ -137,14 +137,16 @@ class GenerateKeyPairs():
     def __generate_key_pairs(self):
         """The function uses the `cryptography` library to generate the RSA keys. It creates two private keys,
         each with a size of 2048 bits and a public exponent of 65537. The private keys are serialized
-        to PEM format without encryption, and the public keys are also serialized to PEM format.
+        to PEM (Privacy-Enhanced Mail) format without encryption, and the public keys are also serialized to 
+        PEM format.
 
         The function returns the private key PEMs, public key fingerprints, and the public keys formatted
         for Snowflake. The public keys are stripped of line feeds, carriage returns, and the header and footer,
         resulting in a continuous string that meets Snowflake's requirements for key-pair authentication.
 
         The fingerprints of the public keys are computed as base64-encoded SHA-256 hashes of the public keys
-        in DER format. These fingerprints are used for JWT creation and storage in AWS Secrets Manager.
+        in DER (Distinguished Encoding Rules) format. These fingerprints are used for JWT (JSON Web Token) creation
+        and storage in AWS Secrets Manager.
 
         Note:
         - The function does not handle any exceptions that may occur during key generation or serialization.
