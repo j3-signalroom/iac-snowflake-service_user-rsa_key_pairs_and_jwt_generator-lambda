@@ -86,8 +86,9 @@ class GenerateKeyPairs():
             # Return the result as a JSON response.
             return 200, "Generated keys and tokens successfully.", secrets
         except Exception as e:
-            logger.error("Error updating secrets in AWS Secrets Manager: %s", e)
-            return 500, "Failed to update secrets in AWS Secrets Manager.", {}
+            message = f"Error updating secrets in AWS Secrets Manager: {e}"
+            logger.error(message)
+            return 500, message, {}
 
     def get_secrets_path(self) -> str:
         """Returns the secrets path."""
