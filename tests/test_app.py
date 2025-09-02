@@ -13,7 +13,7 @@ __copyright__  = "Copyright (c) 2025 Jeffrey Jonathan Jennings"
 __credits__    = ["Jeffrey Jonathan Jennings (J3)"]
 __maintainer__ = "Jeffrey Jonathan Jennings (J3)"
 __email__      = "j3@thej3.com"
-__status__     = "dev"
+__status__     = "production/stable"
  
 
 # Configure the logger
