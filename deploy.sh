@@ -2,7 +2,7 @@
 
 #
 # *** Script Syntax ***
-# deploy.sh <create | delete> --profile=<SSO_PROFILE_NAME>
+# ./deploy.sh <create | delete> --profile=<SSO_PROFILE_NAME>
 #
 #
 
