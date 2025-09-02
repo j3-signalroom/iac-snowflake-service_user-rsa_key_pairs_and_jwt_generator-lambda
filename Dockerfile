@@ -29,14 +29,14 @@ FROM public.ecr.aws/lambda/python:3.13
 # Copy the runtime dependencies from the builder stage.
 COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
 
-# Container metadata
+# Container metadata.
 LABEL maintainer=j3@thej3.com \
       description="IaC Snowflake User RSA Key Pairs Generator Lambda"
 
-# Copy code from host into the container
+# Copy code from host into the container.
 COPY src/__init__.py ${LAMBDA_TASK_ROOT}
 COPY src/app.py ${LAMBDA_TASK_ROOT}
 COPY src/generate_key_pairs.py ${LAMBDA_TASK_ROOT}
 
-# Set the entrypoint for the container
+# Set the entrypoint for the container.
 CMD ["app.lambda_handler"]
