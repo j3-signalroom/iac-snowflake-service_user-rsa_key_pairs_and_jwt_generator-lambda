@@ -13,7 +13,7 @@ __copyright__  = "Copyright (c) 2025 Jeffrey Jonathan Jennings"
 __credits__    = ["Jeffrey Jonathan Jennings (J3)"]
 __maintainer__ = "Jeffrey Jonathan Jennings (J3)"
 __email__      = "j3@thej3.com"
-__status__     = "dev"
+__status__     = "production/stable"
  
 
 # Configure the logger
@@ -33,9 +33,7 @@ account_config = {}
 
 @pytest.fixture(autouse=True)
 def load_configurations():
-    """
-    Fixture to load configurations before each test.
-    """
+    """Fixture to load configurations before each test."""
     # Load configurations here if needed
     load_dotenv()
  
@@ -55,8 +53,7 @@ def load_configurations():
 
 
 def test_generate_key_pairs():
-    """Test the key pairs generation function.
-    """
+    """Test the key pairs generation function."""
     key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
     logger.info("Snowflake RSA Public Key 1 PEM: \n%s\n", key_pairs.get_snowflake_rsa_public_key_1_pem())
     logger.info("Snowflake RSA Public Key 2 PEM: \n%s\n", key_pairs.get_snowflake_rsa_public_key_2_pem())
@@ -109,8 +106,7 @@ def test_sso_authentication():
 
 
 def test_generate_key_pairs_with_secret_insert():
-    """Test the key pairs generation function with secret insert.
-    """
+    """Test the key pairs generation function with secret insert."""
     session = create_sso_session(sso_profile_name)
 
     key_pairs = GenerateKeyPairs(account_config[ACCOUNT_CONFIG["snowflake_account_identifier"]], account_config[ACCOUNT_CONFIG["snowflake_user"]], account_config[ACCOUNT_CONFIG["secrets_path"]])
