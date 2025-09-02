@@ -2,10 +2,10 @@
 This AWS Lambda function, developed in Python, automates the creation of two [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) and a JWT, which are essential for enabling secure, public-key authentication for a Snowflake user or service account. (The reason why only two RSA key pairs are created is that Snowflake currently limits each user to a maximum of two.) Having at least two RSA key pairs helps facilitate key rotation to maintain security and compliance. After generating the RSA key pairs, the function securely stores them in AWS Secrets Manager, using encryption and detailed access controls to protect the keys from unauthorized access. This process not only allows for seamless retrieval and management of the RSA key pairs for future authentication by the Snowflake service account user but also ensures that the keys are handled according to best practices for cloud security and data protection.
 
 > **Important Note**: _If you are reading this before November 2025, Snowflake announced in 2024 that it will [block single-factor password authentication](https://www.snowflake.com/en/blog/blocking-single-factor-password-authentification/) for user and service accounts!_
-
-![holy-shit-shocked](.blog/images/holy-shit-shocked.gif)
-
-So, I am glad you are reading this!  😉
+>
+> ![holy-shit-shocked](.blog/images/holy-shit-shocked.gif)
+>
+> So, I am glad you are reading this!  😉
 
 **Table of Contents**
 
