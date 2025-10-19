@@ -1,11 +1,5 @@
-# IaC Snowflake User RSA Key Pairs and JWT Generator
-This AWS Lambda function, developed in Python, automates the creation of two [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) and a [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token), which are essential for enabling secure, public-key authentication for a Snowflake user or service account. (The reason why only two RSA key pairs are created is that Snowflake currently limits each user to a maximum of two.) Having at least two RSA key pairs helps facilitate key rotation to maintain security and compliance. After generating the RSA key pairs, the function securely stores them in AWS Secrets Manager, using encryption and detailed access controls to protect the keys from unauthorized access. This process not only allows for seamless retrieval and management of the RSA key pairs for future authentication by the Snowflake service account user but also ensures that the keys are handled according to best practices for cloud security and data protection.
-
-> **Important Note**: _If you are reading this before November 2025, Snowflake announced in 2024 that it will [block single-factor password authentication](https://www.snowflake.com/en/blog/blocking-single-factor-password-authentification/) for user and service accounts!_
->
-> ![holy-shit-shocked](.blog/images/holy-shit-shocked.gif)
->
-> So, I am glad you are reading this!  😉
+# IaC Snowflake Service User RSA Key Pairs and JWT Generator
+This AWS Lambda function, developed in Python, automates the creation of two [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) and a [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token), which are essential for enabling secure, public-key authentication for a Snowflake service account. (The reason why only two RSA key pairs are created is that Snowflake currently limits each user to a maximum of two.) Having at least two RSA key pairs helps facilitate key rotation to maintain security and compliance. After generating the RSA key pairs, the function securely stores them in AWS Secrets Manager, using encryption and detailed access controls to protect the keys from unauthorized access. This process not only allows for seamless retrieval and management of the RSA key pairs for future authentication by the Snowflake service account user but also ensures that the keys are handled according to best practices for cloud security and data protection.
 
 **Table of Contents**
 
@@ -92,7 +86,7 @@ To test the generation of RSA key pairs, you can use the provided test script lo
 
 ```bash
 SNOWFLAKE_ACCOUNT_IDENTIFIER=<SNOWFLAKE_ACCOUNT_IDENTIFIER>
-SNOWFLAKE_ADMIN_SERVICE_USER=<SNOWFLAKE_ADMIN_SERVICE_USER>
+SNOWFLAKE_SERVICE_USER=<SNOWFLAKE_SERVICE_USER>
 SECRETS_PATH=<SECRETS_PATH>
 SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 ```
@@ -100,7 +94,7 @@ SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 Environment Variable|Description
 ---|---
 SNOWFLAKE_ACCOUNT_IDENTIFIER|The Snowflake account identifier.
-SNOWFLAKE_ADMIN_SERVICE_USER|The Snowflake user name.
+SNOWFLAKE_SERVICE_USER|The Snowflake user name.
 SECRETS_PATH|The path to the AWS Secrets Manager secrets.
 SSO_PROFILE_NAME|Your AWS SSO profile name.
 

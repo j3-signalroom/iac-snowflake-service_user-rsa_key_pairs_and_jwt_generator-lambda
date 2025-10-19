@@ -62,7 +62,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: "iac-snowflake-user-rsa_key_pairs_and_jwt_generator"
+          REPOSITORY: "iac-snowflake-service_user-rsa_key_pairs_and_jwt_generator"
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
