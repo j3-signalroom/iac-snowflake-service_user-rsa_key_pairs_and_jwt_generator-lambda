@@ -31,16 +31,16 @@ class GenerateKeyPairs():
     It uses the `cryptography` library to generate the keys and the `PyJWT` library to create JWTs.
     """
 
-    def __init__(self, snowflake_account_identifier: str, snowflake_admin_service_user: str, secrets_path: str):
+    def __init__(self, snowflake_account_identifier: str, snowflake_service_user: str, secrets_path: str):
         """Initialize the GenerateKeyPairs class.
 
         Args:
             snowflake_account_identifier (str): The account identifier for the Snowflake service user.
-            snowflake_admin_service_user (str): The username for the Snowflake admin service user.
+            snowflake_service_user (str): The username for the Snowflake service user.
             secrets_path (str): The secret path in AWS Secrets Manager.
         """
         self.snowflake_account_identifier = snowflake_account_identifier.upper()
-        self.snowflake_admin_service_user = snowflake_admin_service_user.upper()
+        self.snowflake_service_user = snowflake_service_user.upper()
         self.secrets_path = secrets_path
 
         self.__generate_key_pairs()
@@ -67,7 +67,7 @@ class GenerateKeyPairs():
             # Create a dictionary with the root secrets
             secrets = {
                 "snowflake_account_identifier": self.snowflake_account_identifier,
-                "snowflake_admin_service_user": self.snowflake_admin_service_user,
+                "snowflake_service_user": self.snowflake_service_user,
                 "secrets_path": self.secrets_path,
                 "rsa_public_key_1_pem": self.rsa_public_key_1_pem,
                 "rsa_public_key_2_pem": self.rsa_public_key_2_pem,
@@ -237,7 +237,7 @@ class GenerateKeyPairs():
             str: The generated JWT token.
         """
         # Create the account identifier.
-        issuer = f"{self.snowflake_account_identifier}.{self.snowflake_admin_service_user}"
+        issuer = f"{self.snowflake_account_identifier}.{self.snowflake_service_user}"
 
         # Create JWT payload
         payload = {
