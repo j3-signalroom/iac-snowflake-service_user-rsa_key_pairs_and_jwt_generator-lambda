@@ -1,5 +1,5 @@
 # IaC Snowflake User RSA Key Pairs and JWT Generator
-This AWS Lambda function, developed in Python, automates the creation of two [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) and a JWT, which are essential for enabling secure, public-key authentication for a Snowflake user or service account. (The reason why only two RSA key pairs are created is that Snowflake currently limits each user to a maximum of two.) Having at least two RSA key pairs helps facilitate key rotation to maintain security and compliance. After generating the RSA key pairs, the function securely stores them in AWS Secrets Manager, using encryption and detailed access controls to protect the keys from unauthorized access. This process not only allows for seamless retrieval and management of the RSA key pairs for future authentication by the Snowflake service account user but also ensures that the keys are handled according to best practices for cloud security and data protection.
+This AWS Lambda function, developed in Python, automates the creation of two [RSA key pairs](https://github.com/j3-signalroom/j3-techstack-lexicon/blob/main/cryptographic-glossary.md#rsa-key-pair) and a [JWT](https://en.wikipedia.org/wiki/JSON_Web_Token), which are essential for enabling secure, public-key authentication for a Snowflake user or service account. (The reason why only two RSA key pairs are created is that Snowflake currently limits each user to a maximum of two.) Having at least two RSA key pairs helps facilitate key rotation to maintain security and compliance. After generating the RSA key pairs, the function securely stores them in AWS Secrets Manager, using encryption and detailed access controls to protect the keys from unauthorized access. This process not only allows for seamless retrieval and management of the RSA key pairs for future authentication by the Snowflake service account user but also ensures that the keys are handled according to best practices for cloud security and data protection.
 
 > **Important Note**: _If you are reading this before November 2025, Snowflake announced in 2024 that it will [block single-factor password authentication](https://www.snowflake.com/en/blog/blocking-single-factor-password-authentification/) for user and service accounts!_
 >
@@ -27,13 +27,13 @@ This AWS Lambda function, developed in Python, automates the creation of two [R
 
 2. **Get the repo**:  Clone the repo:
     ```bash
-    git clone https://github.com/j3-signalroom/iac-snowflake-user-rsa_key_pairs_and_jwt_generator-lambda.git
+    git clone https://github.com/j3-signalroom/iac-snowflake-service_user-rsa_key_pairs_and_jwt_generator-lambda.git
     ```
 
-3. **Navigate to the Root Directory**:  Open your Terminal and navigate to the root folder of the `iac-snowflake-user-rsa_key_pairs_and_jwt_generator-lambda/` repository that you have cloned. You can do this by executing:
+3. **Navigate to the Root Directory**:  Open your Terminal and navigate to the root folder of the `iac-snowflake-service_user-rsa_key_pairs_and_jwt_generator-lambda/` repository that you have cloned. You can do this by executing:
 
    ```bash
-   cd path/to/iac-snowflake-user-rsa_key_pairs_and_jwt_generator-lambda/
+   cd path/to/iac-snowflake-service_user-rsa_key_pairs_and_jwt_generator-lambda/
    ```
 
    Replace `path/to/` with the actual path where your repository is located.
@@ -92,7 +92,7 @@ To test the generation of RSA key pairs, you can use the provided test script lo
 
 ```bash
 SNOWFLAKE_ACCOUNT_IDENTIFIER=<SNOWFLAKE_ACCOUNT_IDENTIFIER>
-SNOWFLAKE_USER=<SNOWFLAKE_USER>
+SNOWFLAKE_ADMIN_SERVICE_USER=<SNOWFLAKE_ADMIN_SERVICE_USER>
 SECRETS_PATH=<SECRETS_PATH>
 SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 ```
@@ -100,7 +100,7 @@ SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 Environment Variable|Description
 ---|---
 SNOWFLAKE_ACCOUNT_IDENTIFIER|The Snowflake account identifier.
-SNOWFLAKE_USER|The Snowflake user name.
+SNOWFLAKE_ADMIN_SERVICE_USER|The Snowflake user name.
 SECRETS_PATH|The path to the AWS Secrets Manager secrets.
 SSO_PROFILE_NAME|Your AWS SSO profile name.
 
