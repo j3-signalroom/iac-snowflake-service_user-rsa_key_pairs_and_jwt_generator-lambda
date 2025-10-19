@@ -94,7 +94,7 @@ SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 Environment Variable|Description
 ---|---
 SNOWFLAKE_ACCOUNT_IDENTIFIER|The Snowflake account identifier.
-SNOWFLAKE_SERVICE_USER|The Snowflake user name.
+SNOWFLAKE_SERVICE_USER|The Snowflake service user name.
 SECRETS_PATH|The path to the AWS Secrets Manager secrets.
 SSO_PROFILE_NAME|Your AWS SSO profile name.
 
