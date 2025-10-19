@@ -36,7 +36,7 @@ def lambda_handler(event, context):
     try:
         # Retrieve parameters from the event.
         snowflake_account_identifier = event.get("snowflake_account_identifier", "").upper()
-        snowflake_user = event.get("snowflake_user", "").upper()
+        snowflake_admin_service_user = event.get("snowflake_admin_service_user", "").upper()
         secrets_path = event.get("secrets_path", "").lower()
     except KeyError as e:
         # Return a 400 status code with the error message.
@@ -49,12 +49,12 @@ def lambda_handler(event, context):
         }
     
     logger.info("Account Identifier: %s", snowflake_account_identifier)
-    logger.info("Snowflake User: %s", snowflake_user)
+    logger.info("Snowflake Admin User: %s", snowflake_admin_service_user)
     logger.info("Secrets Path: %s", secrets_path)
 
     try:
         # Generate key pairs.
-        key_pairs = GenerateKeyPairs(snowflake_account_identifier, snowflake_user, secrets_path)
+        key_pairs = GenerateKeyPairs(snowflake_account_identifier, snowflake_admin_service_user, secrets_path)
 
         # Store the keys in AWS Secrets Manager.
         http_status_code, message, data = key_pairs.update_secrets(boto3.client('secretsmanager'))

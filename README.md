@@ -92,7 +92,7 @@ To test the generation of RSA key pairs, you can use the provided test script lo
 
 ```bash
 SNOWFLAKE_ACCOUNT_IDENTIFIER=<SNOWFLAKE_ACCOUNT_IDENTIFIER>
-SNOWFLAKE_USER=<SNOWFLAKE_USER>
+SNOWFLAKE_ADMIN_SERVICE_USER=<SNOWFLAKE_ADMIN_SERVICE_USER>
 SECRETS_PATH=<SECRETS_PATH>
 SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 ```
@@ -100,7 +100,7 @@ SSO_PROFILE_NAME=<SSO_PROFILE_NAME>
 Environment Variable|Description
 ---|---
 SNOWFLAKE_ACCOUNT_IDENTIFIER|The Snowflake account identifier.
-SNOWFLAKE_USER|The Snowflake user name.
+SNOWFLAKE_ADMIN_SERVICE_USER|The Snowflake user name.
 SECRETS_PATH|The path to the AWS Secrets Manager secrets.
 SSO_PROFILE_NAME|Your AWS SSO profile name.
 
